@@ -14,12 +14,13 @@ body {
   align-items: center;
   flex-direction: column;
   width: 15%;
-  border-right: 2px solid white;
+  border-right: 2px solid gray;
   height: 100%;
 }
 .temperature{
-  background-color: white;
-  height: 200px;
+  margin-top: 90%;
+  background-color: wheat;
+  height: 250px;
   width: 50px;
 }
 .tempfill {
@@ -51,7 +52,7 @@ body {
   justify-content: space-between ;
   align-items: center;
   width: 100%;
-  border-bottom: 2px solid white;
+  border-bottom: 2px solid gray;
   margin: 10px 0;
   height: 82px; /* Set to 100px */
   align-self: flex-start;
@@ -59,11 +60,11 @@ body {
 }
 .status-icon{
   height: 50px;
-  width: 50px;
+  width: 60px;
   padding-top: 16px;
   padding-bottom: 16px;
-  padding-left: 50px;
-  padding-right: 50px;
+  padding-left: 25px;
+  padding-right: 25px;
 }
 #Left_Indicator{
   visibility: visible;
@@ -72,6 +73,12 @@ body {
   visibility: visible;
 }
 #Right_Indicator{
+  visibility: visible;
+}
+#Check_engine{
+  visibility: visible;
+}
+#sus{
   visibility: visible;
 }
 
@@ -90,20 +97,21 @@ body {
   align-items:center;
 }
 .trapezoid-container{
+  position: fixed;
+  align-self: center;
   height: 350px;
-  width: 500px;
-  overflow: hidden;
+  width: 600px;
   display: flex;
   justify-content:flex-start;
   flex-direction: column-reverse;
-
+  overflow: hidden;
 }
 .trapezoid {
-  width: 400px; /* Change the width as needed */
+  width: 450px; /* Change the width as needed */
   height: 0;
   border-left: 150px solid transparent;
   border-right: 0px solid transparent;
-  border-bottom: 300px solid wheat; /* Change the height and color as needed */
+  border-bottom: 300px solid whitesmoke; /* Change the height and color as needed */
   z-index: -1;
   
 }
@@ -123,13 +131,14 @@ body {
 }
 .speed{
   position: relative;
-  margin-top:75%;
-  margin-left: -55%;
+  padding-top:   55%;
+  padding-left: -40%;
+  padding-right: 40%;
 
   z-index: 1;
   font-family: Arial, Helvetica, sans-serif;
-  color: wheat;
-  font-size: 96px;
+  color: whitesmoke;
+  font-size: 128px;
   font-weight: bold;
 
 }
@@ -140,12 +149,13 @@ body {
   align-items: center;
   flex-direction: column;
   width: 15%;
-  border-left: 2px solid white;
+  border-left: 2px solid gray;
   height: 100%;
 }
 .fuel-level{
-  background-color: white;
-  height: 200px;
+  margin-top: 90%;
+  background-color: wheat;
+  height: 250px;
   width: 50px;
 }
 .fuelfill {
