@@ -14,28 +14,24 @@ body {
   align-items: center;
   flex-direction: column;
   width: 15%;
-  border-right: 2px solid gray;
+  border-right: 1px solid darkgrey;
   height: 100%;
 }
-.temperature{
-  margin-top: 90%;
-  background-color: wheat;
-  height: 250px;
-  width: 50px;
-}
-.tempfill {
-  position: relative;
-  left: 5%;
-  top: 1%;
-  width: 90%; /* Set the width to 50% */
-  height: 50%; /* Set the height as needed */
-  background-color: black; /* Set your desired color */
+#temptxt{
+  font-size: 21px;
+  color: lightgray;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-bottom: 31px;
+  font-weight: bold;
 }
 #tempnum{
-  font-size: 48px;
-  color: aliceblue;
+  font-size: 56px;
+  color: lightgray;
   font-family: Arial, Helvetica, sans-serif;
   margin: 16px;
+  font-weight: bold;
 }
 
 .middle-container {
@@ -52,9 +48,9 @@ body {
   justify-content: space-between ;
   align-items: center;
   width: 100%;
-  border-bottom: 2px solid gray;
+  border-bottom: 1px solid darkgrey;
   margin: 10px 0;
-  height: 82px; /* Set to 100px */
+  height: 81px; /* Set to 100px */
   align-self: flex-start;
   flex-shrink: 0; /* Prevent shrinking */ 
 }
@@ -99,7 +95,8 @@ body {
 .trapezoid-container{
   position: fixed;
   align-self: center;
-  height: 350px;
+  margin-top: -80px;
+  height: 400px;
   width: 600px;
   display: flex;
   justify-content:flex-start;
@@ -149,13 +146,13 @@ body {
   align-items: center;
   flex-direction: column;
   width: 15%;
-  border-left: 2px solid gray;
+  border-left: 1px solid darkgrey;
   height: 100%;
 }
 .fuel-level{
   margin-top: 90%;
-  background-color: wheat;
-  height: 250px;
+  background-color: lightgray;
+  height: 220px;
   width: 50px;
 }
 .fuelfill {
