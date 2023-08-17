@@ -35,12 +35,12 @@ body {
 }
 
 .middle-container {
-  width: 70%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 400px;
-  min-height: 500px;
+  min-height: 100%;
 }
 
 .top-middle-div {
@@ -49,8 +49,8 @@ body {
   align-items: center;
   width: 100%;
   border-bottom: 1px solid darkgrey;
-  margin: 10px 0;
-  height: 81px; /* Set to 100px */
+  margin-top: 16px 0;
+
   align-self: flex-start;
   flex-shrink: 0; /* Prevent shrinking */ 
 }
@@ -84,9 +84,10 @@ body {
   align-items: center;
   flex-direction: column;
   width: 100%;
-  /*border: 5px solid white;*/
+  /*border: 2px solid white;*/
   margin: 10px 0;
-  height: 70vh;
+  margin-bottom: 0px;
+  height: 100%;
   flex-grow: 1; /* Fill the remaining space */
   align-self: flex-start; /* Anchor to the top */
   flex-direction: column;
@@ -95,7 +96,7 @@ body {
 .trapezoid-container{
   position: fixed;
   align-self: center;
-  margin-top: -80px;
+  margin-top: -50px;
   height: 400px;
   width: 600px;
   display: flex;
@@ -131,13 +132,20 @@ body {
   padding-top:   55%;
   padding-left: -40%;
   padding-right: 40%;
-
   z-index: 1;
   font-family: Arial, Helvetica, sans-serif;
   color: whitesmoke;
   font-size: 128px;
   font-weight: bold;
-
+}
+.ODO-TRIP{
+  font-family: Arial, Helvetica, sans-serif;
+  position:relative;
+  height: 10%;
+  width: auto;
+  color: white;
+  padding: 16px;
+  font-size: 30px;
 }
 
 .right-div {
@@ -150,7 +158,7 @@ body {
   height: 100%;
 }
 .fuel-level{
-  margin-top: 90%;
+  margin-top: 50%;
   background-color: lightgray;
   height: 220px;
   width: 50px;
@@ -162,4 +170,12 @@ body {
   width: 90%; /* Set the width to 50% */
   height: 50%; /* Set the height as needed */
   background-color: black; /* Set your desired color */
+}
+#fuelnum{
+  font-size: 56px;
+  color: lightgray;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 16px;
+  padding-bottom: 10%;
+  font-weight: bold;
 }
