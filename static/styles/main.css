@@ -66,16 +66,16 @@ body {
   visibility: visible;
 }
 #High_Beam_Indicator{
-  visibility: hidden;
+  visibility: visible;
 }
 #Right_Indicator{
   visibility: visible;
 }
 #Check_engine{
-  visibility: hidden;
+  visibility: visible;
 }
 #sus{
-  visibility: hidden;
+  visibility: visible;
 }
 
 .bottom-middle-div {
