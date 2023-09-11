@@ -12,6 +12,7 @@ def getspeed(gpio_pin, correction):
     frequencies = []
     num_samples = 1
     sampler = 0
+
     if correction == None:
         correction = 1.0
     try:
@@ -45,6 +46,9 @@ def getspeed(gpio_pin, correction):
                     final_frequency = sum(frequencies) / len(frequencies)
                     speed = final_frequency * 0.779221  # Converting frequency to kmh ( 60kmh = 77hz)
                     corrected_speed = speed * correction # Correcting speed for known measuring error
+                    break
+                elif len(frequencies) > 50:
+                    # this causes immense pain + auygh
                     break
             
             prev_time = time.time()

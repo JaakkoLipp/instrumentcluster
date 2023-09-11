@@ -24,6 +24,7 @@ def getrpm(gpio_pin):
                 frequencies.append(frequency)
                 
             prev_time = time.time()
+            
         # frequency to rpm and average as final_frequency
         final_frequency = sum(frequencies) / len(frequencies)
         rpm = final_frequency * 30  # Converting frequency to rpm (6000rpm = 200hz and 30rpm = 1hz)
