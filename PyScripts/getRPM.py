@@ -13,6 +13,7 @@ def getrpm(gpio_pin):
     num_samples = 10
 
     try:
+        #TODO needs fix
         while True:
             # Wait for the first falling edge
             GPIO.wait_for_edge(gpio_pin, GPIO.FALLING)
@@ -25,14 +26,13 @@ def getrpm(gpio_pin):
                 frequencies.append(frequency)
                 falling_edges += 1
                 
-                
                 # Exit after a specified number of samples
                 if falling_edges >= num_samples:
                     rpm = frequencies * 30  # Converting frequency to rpm (6000rpm = 200hz and 30rpm = 1hz)
                     break
             
             prev_time = time.time()
-    
+
     except KeyboardInterrupt:
         pass
     

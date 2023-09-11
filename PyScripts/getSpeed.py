@@ -15,6 +15,7 @@ def getspeed(gpio_pin, correction):
     if correction == None:
         correction = 1.0
     try:
+        #TODO needs fix
         while True:
             # Wait for the first falling edge
             GPIO.wait_for_edge(gpio_pin, GPIO.FALLING)
@@ -29,11 +30,11 @@ def getspeed(gpio_pin, correction):
                 if sampler == 0:   # Going to run only once to determinate sample size
                     if frequency <=4:
                         num_samples = 1
-                    if frequency > 4 and frequency < 8:
+                    elif frequency > 4 and frequency < 8:
                         num_samples = 2
-                    if frequency >= 8 and frequency < 15:
+                    elif frequency >= 8 and frequency < 15:
                         num_samples = 4
-                    if frequency >= 15 and frequency < 40:
+                    elif frequency >= 15 and frequency < 40:
                         num_samples = 7
                     else:
                         num_samples = 12
@@ -41,6 +42,7 @@ def getspeed(gpio_pin, correction):
                 
                 # Exit after a specified number of samples
                 if falling_edges >= num_samples:
+                    #TODO needs fix
                     speed = frequencies * 0.779221  # Converting frequency to kmh ( 60kmh = 77hz)
                     corrected_speed = speed * correction # Correcting speed for known measuring error
                     break
