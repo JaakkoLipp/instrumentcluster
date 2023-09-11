@@ -7,14 +7,12 @@ def getrpm(gpio_pin):
     GPIO.setup(gpio_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     # Initialize variables
-    falling_edges = 0
     prev_time = None
     frequencies = []
     num_samples = 10
 
     try:
-        #TODO needs fix
-        while True:
+        for x in range(num_samples):
             # Wait for the first falling edge
             GPIO.wait_for_edge(gpio_pin, GPIO.FALLING)
             
@@ -24,14 +22,11 @@ def getrpm(gpio_pin):
                 time_difference = current_time - prev_time
                 frequency = 1.0 / time_difference  # Calculate frequency
                 frequencies.append(frequency)
-                falling_edges += 1
                 
-                # Exit after a specified number of samples
-                if falling_edges >= num_samples:
-                    rpm = frequencies * 30  # Converting frequency to rpm (6000rpm = 200hz and 30rpm = 1hz)
-                    break
-            
             prev_time = time.time()
+        # frequency to rpm and average as final_frequency
+        final_frequency = sum(frequencies) / len(frequencies)
+        rpm = final_frequency * 30  # Converting frequency to rpm (6000rpm = 200hz and 30rpm = 1hz)
 
     except KeyboardInterrupt:
         pass
