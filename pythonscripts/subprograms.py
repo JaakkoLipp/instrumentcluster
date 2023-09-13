@@ -17,7 +17,8 @@ SPEEDPIN = 1 #speedometer input gpio pin
 RPM_PIN = 2 #rpm input pin
 NEUTRAL_LIST = ["/dev/spidev1.0", 5] #neutralpin adc [device, channel 0-7]
 V12_READ_INPUTLIST = ["/dev/spidev1.0", 7] #12v sensing inputpin adc [device, channel 0-7]
-
+WATERTEMP_INPUT_LIST = ["/dev/spidev1.1", 0, 5] #watertemp inputpin adc [device, channel 0-7], watertemp multiplier by resistance
+RESERVEFUEL_INPUT_LIST = [["/dev/spidev1.1", 2, 5]] #reservefuel inputpin adc [device, channel 0-7], reserve fuel state multiplier by resistance
 
 def read_volts_12(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = V12_READ_INPUTLIST[0]
@@ -58,7 +59,10 @@ def read_low(devicechannellist): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channe
     return finaldata
 
 
-def read_watertemperature(device, channel, multiplier): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+def read_watertemperature(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+    device = WATERTEMP_INPUT_LIST[0]
+    channel = WATERTEMP_INPUT_LIST[1]
+    multiplier = WATERTEMP_INPUT_LIST[2]
     status = spi.openSPI(device, speed=1000000)
     adc = spi.transfer((1,(8+channel)<<4,0))
     data = ((adc[1]&3) << 8) + adc[2]
@@ -68,7 +72,10 @@ def read_watertemperature(device, channel, multiplier): #"/dev/spidev1.0" tai "/
     return temperature
 
 
-def read_reservefuel(device, channel, multiplier): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+def read_reservefuelstate(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+    device = RESERVEFUEL_INPUT_LIST[0]
+    channel = RESERVEFUEL_INPUT_LIST[1]
+    multiplier = RESERVEFUEL_INPUT_LIST[2]
     status = spi.openSPI(device, speed=1000000)
     adc = spi.transfer((1,(8+channel)<<4,0))
     data = ((adc[1]&3) << 8) + adc[2]
