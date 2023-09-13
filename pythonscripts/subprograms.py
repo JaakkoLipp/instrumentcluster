@@ -19,6 +19,14 @@ NEUTRAL_LIST = ["/dev/spidev1.0", 5] #neutralpin adc [device, channel 0-7]
 V12_READ_INPUTLIST = ["/dev/spidev1.0", 7] #12v sensing inputpin adc [device, channel 0-7]
 WATERTEMP_INPUT_LIST = ["/dev/spidev1.1", 0, 5] #watertemp inputpin adc [device, channel 0-7], watertemp multiplier by resistance
 RESERVEFUEL_INPUT_LIST = [["/dev/spidev1.1", 2, 5]] #reservefuel inputpin adc [device, channel 0-7], reserve fuel state multiplier by resistance
+BLINKER_LEFT_LIST = ["/dev/spidev1.0", 0]
+BLINKER_RIGHT_LIST = ["/dev/spidev1.0", 1]
+HI_BEAM_LIST = ["/dev/spidev1.0", 2]
+LEFT_BUTTON_LIST = ["/dev/spidev1.0", 3]
+RIGHT_BUTTON_LIST = ["/dev/spidev1.0", 4]
+ENGINE_LIGHT_LIST = ["/dev/spidev1.0", 6]
+OIL_LIGHT_LIST = ["/dev/spidev1.1", 3]
+
 
 def read_volts_12(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = V12_READ_INPUTLIST[0]
@@ -201,4 +209,15 @@ def get_gear_speed_and_rpm(): #returns list containing [str:gear, int:speed km/h
             if (abs(ratio-GEAR_RATIO[i]) < GEAR_SENSITIVITY):
                 return ([str(i + 1), speed, rpm])
         return (["-", speed, rpm])
+    
+
+def get_status():       # status output list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light]. when on, state is 1, when off state is 0
+    blinker_left = read_hi(BLINKER_LEFT_LIST)
+    blinker_right = read_hi(BLINKER_RIGHT_LIST)
+    hi_beam = read_hi(HI_BEAM_LIST)
+    left_button = read_hi(LEFT_BUTTON_LIST)
+    right_button = read_hi(RIGHT_BUTTON_LIST)
+    engine_light = read_low(ENGINE_LIGHT_LIST)
+    oil_light = read_low(OIL_LIGHT_LIST)
+    return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light])
       
