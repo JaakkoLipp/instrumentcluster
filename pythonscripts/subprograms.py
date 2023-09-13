@@ -11,6 +11,7 @@ FRONT_SPROCKET_PULSES_PER_ROTATION = 4 # How many pulses speedsensor sends each 
 MULTIPLIER_12V = 1 # Must be defined to run code correctly!!  #TODO check multiplier value
 HIREADLIMIT = 0.6
 LOWREADLIMIT = 0.25
+NIGHTMODETHRESHOLD = 30 #TODO #resistance for nightmode activation threshold
 
 #TODO gpio input pins plox check correct
 SPEEDPIN = 1 #speedometer input gpio pin
@@ -77,7 +78,11 @@ def read_ambient_light(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     spi.close()
     resistance = (data / 1023) * (3.3 * multiplier)
     light_level = resistance #TODO check light level resistance curve to use!!!
-    return light_level
+    if light_level > NIGHTMODETHRESHOLD:
+        finaldata = 1
+    else:
+        finaldata = 0
+    return finaldata
 
 def read_ambient_temperature(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = AMBIENT_TEMP_LIST[0]
