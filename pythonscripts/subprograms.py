@@ -249,5 +249,6 @@ def get_status():  # status output 7 segment list: [blinker left, blinker right,
     right_button = read_hi(RIGHT_BUTTON_LIST)
     engine_light = read_low(ENGINE_LIGHT_LIST)
     oil_light = read_low(OIL_LIGHT_LIST)
+    detect_longpress_left = 
     return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light])
-      
+    
