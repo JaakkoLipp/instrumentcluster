@@ -12,7 +12,7 @@ MULTIPLIER_12V = 1 # Must be defined to run code correctly!!  #TODO check multip
 HIREADLIMIT = 0.6
 LOWREADLIMIT = 0.25
 NIGHTMODETHRESHOLD= 30 #TODO #resistance for nightmode activation threshold
-BUTTONSLEEP = 0.25 #sleeptime to detect long press
+BUTTONSLEEP = 0.35 #sleeptime to detect long press
 
 #TODO gpio input pins plox check correct
 SPEEDPIN = 1 #speedometer input gpio pin
@@ -157,11 +157,11 @@ def getspeed():
                 if sampler == 0:   # Going to run only once to determinate sample size
                     if frequency <=4: #at low speeds using smaller sample size for shorter sampling times
                         num_samples = 1
-                    if frequency > 4 and frequency < 8:
+                    elif frequency > 4 and frequency < 8:
                         num_samples = 2
-                    if frequency >= 8 and frequency < 15:
+                    elif frequency >= 8 and frequency < 15:
                         num_samples = 3
-                    if frequency >= 15 and frequency < 40:
+                    elif frequency >= 15 and frequency < 40:
                         num_samples = 4
                     else:
                         num_samples = 5
@@ -242,7 +242,7 @@ def get_gear_speed_and_rpm(): #returns list containing [str:gear, int:speed km/h
         return (["-", speed, rpm])
     
 
-def get_status():  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0
+def get_status():  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
     blinker_left = read_hi(BLINKER_LEFT_LIST)
     blinker_right = read_hi(BLINKER_RIGHT_LIST)
     hi_beam = read_hi(HI_BEAM_LIST)
@@ -250,6 +250,7 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
     right_button = read_hi(RIGHT_BUTTON_LIST)
     engine_light = read_low(ENGINE_LIGHT_LIST)
     oil_light = read_low(OIL_LIGHT_LIST)
+
     if left_button == 1:
         time.sleep(BUTTONSLEEP)
         left_buttonlongpress = read_hi(LEFT_BUTTON_LIST)
@@ -267,5 +268,16 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
     else:
         sceneshift = 0 # Sceneshift does not shift scene
         longpress = 0 # No long press detected
+
     return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light, sceneshift, longpress])
+    
+
+tripinm = 0
+tripinkm = tripinm / 1000
+speedkmh = 437438
+while True:
+    speedms = speedkmh / 3.6
+    tripinm = tripinm + speedms
+    tripinkm = tripinm / 1000
+    print(round(tripinkm ,1), time.time())
     
