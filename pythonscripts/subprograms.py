@@ -12,7 +12,7 @@ MULTIPLIER_12V = 1 # Must be defined to run code correctly!!  #TODO check multip
 HIREADLIMIT = 0.6
 LOWREADLIMIT = 0.25
 
-#TODO gpio input pins plox
+#TODO gpio input pins plox check correct
 SPEEDPIN = 1 #speedometer input gpio pin
 RPM_PIN = 2 #rpm input pin
 NEUTRAL_LIST = ["/dev/spidev1.0", 5] #neutralpin adc [device, channel 0-7]
@@ -26,7 +26,8 @@ LEFT_BUTTON_LIST = ["/dev/spidev1.0", 3]
 RIGHT_BUTTON_LIST = ["/dev/spidev1.0", 4]
 ENGINE_LIGHT_LIST = ["/dev/spidev1.0", 6]
 OIL_LIGHT_LIST = ["/dev/spidev1.1", 3]
-
+AMBIENT_LIGHT_LIST = ["/dev/spidev1.1", 1, 5] #ambientlight resistor inputpin adc [device, channel 0-7], ambient light multiplier by resistance
+AMBIENT_TEMP_LIST = ["/dev/spidev1.1", 4, 5]  #ambient temperature resistor inputpin adc [device, channel 0-7], ambient temp multiplier by resistance
 
 def read_volts_12(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = V12_READ_INPUTLIST[0]
@@ -65,6 +66,30 @@ def read_low(devicechannellist): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channe
     else:
         finaldata = 0
     return finaldata
+
+def read_ambient_light(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+    device = AMBIENT_LIGHT_LIST[0]
+    channel = AMBIENT_LIGHT_LIST[1]
+    multiplier = AMBIENT_LIGHT_LIST[2]
+    status = spi.openSPI(device, speed=1000000)
+    adc = spi.transfer((1,(8+channel)<<4,0))
+    data = ((adc[1]&3) << 8) + adc[2]
+    spi.close()
+    resistance = (data / 1023) * (3.3 * multiplier)
+    light_level = resistance #TODO check light level resistance curve to use!!!
+    return light_level
+
+def read_ambient_temperature(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+    device = AMBIENT_TEMP_LIST[0]
+    channel = AMBIENT_TEMP_LIST[1]
+    multiplier = AMBIENT_TEMP_LIST[2]
+    status = spi.openSPI(device, speed=1000000)
+    adc = spi.transfer((1,(8+channel)<<4,0))
+    data = ((adc[1]&3) << 8) + adc[2]
+    spi.close()
+    resistance = (data / 1023) * (3.3 * multiplier)
+    temperature = resistance #TODO check ambient temperature probe resistance curve to use!!!
+    return temperature
 
 
 def read_watertemperature(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
@@ -211,7 +236,7 @@ def get_gear_speed_and_rpm(): #returns list containing [str:gear, int:speed km/h
         return (["-", speed, rpm])
     
 
-def get_status():       # status output list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light]. when on, state is 1, when off state is 0
+def get_status():  # status output 7 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light]. when on, state is 1, when off state is 0
     blinker_left = read_hi(BLINKER_LEFT_LIST)
     blinker_right = read_hi(BLINKER_RIGHT_LIST)
     hi_beam = read_hi(HI_BEAM_LIST)
