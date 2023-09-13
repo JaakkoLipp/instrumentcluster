@@ -58,22 +58,22 @@ def read_low(devicechannellist): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channe
     return finaldata
 
 
-def read_watertemperature(device, channel, MULTIPLIER_12V): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+def read_watertemperature(device, channel, multiplier): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     status = spi.openSPI(device, speed=1000000)
     adc = spi.transfer((1,(8+channel)<<4,0))
     data = ((adc[1]&3) << 8) + adc[2]
     spi.close()
-    resistance = (data / 1023) * (3.3 * MULTIPLIER_12V)
+    resistance = (data / 1023) * (3.3 * multiplier)
     temperature = -30.57 * math.log(resistance) + 212.11
     return temperature
 
 
-def read_reservefuel(device, channel, MULTIPLIER_12V): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+def read_reservefuel(device, channel, multiplier): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     status = spi.openSPI(device, speed=1000000)
     adc = spi.transfer((1,(8+channel)<<4,0))
     data = ((adc[1]&3) << 8) + adc[2]
     spi.close()
-    resistance = (data / 1023) * (3.3 * MULTIPLIER_12V)
+    resistance = (data / 1023) * (3.3 * multiplier)
     if resistance < 22:
         reservefuel = 1
     else:
