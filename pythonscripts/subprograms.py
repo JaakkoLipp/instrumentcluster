@@ -183,7 +183,7 @@ def getspeed():
         return [corrected_speed, final_frequency]
     
 
-def getrpm(SPEEDPIN):
+def getrpm():
     # Set up GPIO
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
