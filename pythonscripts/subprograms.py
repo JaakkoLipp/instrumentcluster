@@ -11,7 +11,8 @@ FRONT_SPROCKET_PULSES_PER_ROTATION = 4 # How many pulses speedsensor sends each 
 MULTIPLIER_12V = 1 # Must be defined to run code correctly!!  #TODO check multiplier value
 HIREADLIMIT = 0.6
 LOWREADLIMIT = 0.25
-NIGHTMODETHRESHOLD = 30 #TODO #resistance for nightmode activation threshold
+NIGHTMODETHRESHOLD= 30 #TODO #resistance for nightmode activation threshold
+BUTTONSLEEP = 0.25 #sleeptime to detect long press
 
 #TODO gpio input pins plox check correct
 SPEEDPIN = 1 #speedometer input gpio pin
@@ -241,7 +242,7 @@ def get_gear_speed_and_rpm(): #returns list containing [str:gear, int:speed km/h
         return (["-", speed, rpm])
     
 
-def get_status():  # status output 7 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light]. when on, state is 1, when off state is 0
+def get_status():  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0
     blinker_left = read_hi(BLINKER_LEFT_LIST)
     blinker_right = read_hi(BLINKER_RIGHT_LIST)
     hi_beam = read_hi(HI_BEAM_LIST)
@@ -249,6 +250,22 @@ def get_status():  # status output 7 segment list: [blinker left, blinker right,
     right_button = read_hi(RIGHT_BUTTON_LIST)
     engine_light = read_low(ENGINE_LIGHT_LIST)
     oil_light = read_low(OIL_LIGHT_LIST)
-    detect_longpress_left = 
-    return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light])
+    if left_button == 1:
+        time.sleep(BUTTONSLEEP)
+        left_buttonlongpress = read_hi(LEFT_BUTTON_LIST)
+        if left_buttonlongpress == left_button:
+            longpress = -1 #for long left press. outputs -1
+        else:
+            ssceneshift = -1 # for short left press to switch scene left
+    elif right_button == 1:
+        time.sleep(BUTTONSLEEP)
+        right_buttonlongpress = read_hi(RIGHT_BUTTON_LIST)
+        if right_buttonlongpress == right_button:
+            longpress = 1 #for long right press. outputs 1
+        else: 
+            sceneshift = 1 # for short right press to switch scene right
+    else:
+        sceneshift = 0 # Sceneshift does not shift scene
+        longpress = 0 # No long press detected
+    return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light, sceneshift, longpress])
     
