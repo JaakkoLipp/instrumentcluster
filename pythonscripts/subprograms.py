@@ -141,8 +141,7 @@ def getspeed():
 def getrpm(SPEEDPIN):
     # Set up GPIO
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(SPEEDPIN
-, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     # Initialize variables
     falling_edges = 0
@@ -153,8 +152,7 @@ def getrpm(SPEEDPIN):
     try:
         for x in range(num_samples):
             # Wait for the first falling edge
-            GPIO.wait_for_edge(SPEEDPIN
-        , GPIO.FALLING)
+            GPIO.wait_for_edge(SPEEDPIN, GPIO.FALLING)
             
             # Measure time between falling edges
             if prev_time is not None:
@@ -185,11 +183,11 @@ def get_gear_speed_and_rpm(): #returns list containing [str:gear, int:speed km/h
 
     rpm = getrpm(RPM_PIN)   #gets rpm
 
-    if (read_low(NEUTRAL_LIST) == 1): #reads if neutral pin low or not. If low N displayed.
+    if (read_low(NEUTRAL_LIST) == 1): #reads if neutral pin low or not. If low N is displayed.
         return (["N", speed, rpm])
     else:
 
-        front_sprocket_speed = (speed_frequency / FRONT_SPROCKET_PULSES_PER_ROTATION) * 60
+        front_sprocket_speed = (speed_frequency / FRONT_SPROCKET_PULSES_PER_ROTATION) * 60 # Change revolutions per second to rpm 
         clutch_rpm = rpm / 1.611 # clutch / crank reduction ratio
         ratio = clutch_rpm / front_sprocket_speed
         for i in range(6):
