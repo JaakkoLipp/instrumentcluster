@@ -1,4 +1,4 @@
-import subprograms
+from subprograms import *
 import time, os, math, sys #spi #TODO: spi interface and imports
 #import OPi.GPIO as GPIO
 #from machine import I2C
@@ -13,10 +13,19 @@ def indexpage():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run()
+    #TODO app.run()
 
-    """
-    Backend here
-    @elias
+    odo = odoread()
+    trip = tripread()
+    gear_speed_rpm = get_gear_speed_and_rpm()
 
-    """
+
+    while True: 
+        get arvot
+        print(kaikki arvot) 
+        get arvotspeed,rpm, gear
+        print(kaikki arvot) 
+        get arvotspeed,rpm, gear
+        print(kaikki arvot)
+
+ 
