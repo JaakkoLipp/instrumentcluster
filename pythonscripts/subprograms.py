@@ -193,12 +193,14 @@ def getrpm():
     falling_edges = 0
     prev_time = None
     frequencies = []
-    num_samples = 4
+    num_samples = 2
 
     try:
         for x in range(num_samples):
             # Wait for the first falling edge
-            GPIO.wait_for_edge(SPEEDPIN, GPIO.FALLING)
+            if GPIO.wait_for_edge(RPM_PIN, GPIO.FALLING, timeout=60) is None:  #if timeout occures, return rpm 0 and times out if rpm is lower than 500
+                rpm = 0
+                return rpm 
             
             # Measure time between falling edges
             if prev_time is not None:
@@ -270,14 +272,64 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
         longpress = 0 # No long press detected
 
     return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light, sceneshift, longpress])
-    
 
-tripinm = 0
+tripinm = 0    
+f = open("odometer", "r")
+tripinkm = f.readline()
+print(tripinkm)
+f.close()
 tripinkm = tripinm / 1000
-speedkmh = 437438
+speedkmh = 67
 while True:
     speedms = speedkmh / 3.6
     tripinm = tripinm + speedms
-    tripinkm = tripinm / 1000
+    tripinkm = tripinm / 1000  #crontab file copy #TODO
     print(round(tripinkm ,1), time.time())
+    time.sleep(0.999)
     
+
+def odoread():
+    with open("odo.txt", "r") as file:
+        odoread = file.read()
+        file.close()
+        floatodoread = float(odoread)
+        return floatodoread
+
+def tripread():
+    with open("trip.txt", "r") as file:
+        tripread = file.read()
+        file.close()
+        floattripread = float(tripread)
+        return floattripread
+
+
+def odowrite():
+    try: # Try to open "odo.txt" for writing
+        stringodo = str(ODO)
+        with open("odo.txt", "w") as file:
+            file.write(stringodo)
+            file.close()
+        return
+
+    except FileNotFoundError:
+        stringodo = str(ODO)
+        with open("backup.txt", "w") as file:   # If the file doesn't exist, create "backup.txt" and save "odo" there
+            file.write(stringodo)
+            file.close()
+        return
+        
+
+    except Exception as e:
+        print(f"An error occurred with odowrite: {e}")
+        return
+
+def tripwrite():
+    try: # Try to open "trip.txt" for writing
+        stringtrip = str(TRIP)
+        with open("trip.txt", "w") as file:
+            file.write(stringtrip)
+            file.close()
+        return
+    except Exception as e:
+        print(f"An error occurred with tripwrite: {e}")
+        return
