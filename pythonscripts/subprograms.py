@@ -14,6 +14,7 @@ LOWREADLIMIT = 0.25
 NIGHTMODETHRESHOLD= 30 #TODO #resistance for nightmode activation threshold
 BUTTONSLEEP = 0.35 #sleeptime to detect long press
 
+
 #TODO gpio input pins plox check correct
 SPEEDPIN = 1 #speedometer input gpio pin
 RPM_PIN = 2 #rpm input pin
@@ -273,20 +274,6 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
 
     return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light, sceneshift, longpress])
 
-tripinm = 0    
-f = open("odometer", "r")
-tripinkm = f.readline()
-print(tripinkm)
-f.close()
-tripinkm = tripinm / 1000
-speedkmh = 67
-while True:
-    speedms = speedkmh / 3.6
-    tripinm = tripinm + speedms
-    tripinkm = tripinm / 1000  #crontab file copy #TODO
-    print(round(tripinkm ,1), time.time())
-    time.sleep(0.999)
-    
 
 def odoread():
     with open("odo.txt", "r") as file:
@@ -303,16 +290,16 @@ def tripread():
         return floattripread
 
 
-def odowrite():
+def odowrite(odo):
     try: # Try to open "odo.txt" for writing
-        stringodo = str(ODO)
+        stringodo = str(odo)
         with open("odo.txt", "w") as file:
             file.write(stringodo)
             file.close()
         return
 
     except FileNotFoundError:
-        stringodo = str(ODO)
+        stringodo = str(odo)
         with open("backup.txt", "w") as file:   # If the file doesn't exist, create "backup.txt" and save "odo" there
             file.write(stringodo)
             file.close()
@@ -323,9 +310,9 @@ def odowrite():
         print(f"An error occurred with odowrite: {e}")
         return
 
-def tripwrite():
+def tripwrite(trip):
     try: # Try to open "trip.txt" for writing
-        stringtrip = str(TRIP)
+        stringtrip = str(trip)
         with open("trip.txt", "w") as file:
             file.write(stringtrip)
             file.close()
@@ -333,3 +320,17 @@ def tripwrite():
     except Exception as e:
         print(f"An error occurred with tripwrite: {e}")
         return
+
+tripinm = 0    
+f = open("odometer", "r")
+tripinkm = f.readline()
+print(tripinkm)
+f.close()
+tripinkm = tripinm / 1000
+speedkmh = 67
+while True:
+    speedms = speedkmh / 3.6
+    tripinm = tripinm + speedms
+    tripinkm = tripinm / 1000  #crontab file copy #TODO 
+    print(round(tripinkm ,1), time.time())
+    time.sleep(0.999)
