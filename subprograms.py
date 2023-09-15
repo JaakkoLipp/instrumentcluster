@@ -340,27 +340,28 @@ def scenedrawer(scene, getstatus, odo, trip): #subprogram outputs string which s
 	#TODO when using scenedrawer, must check for list to reset odo
 	# scenecounter starting from 2 to make odometer default display if error occures
 
-	if scene == 2: # scene tripmeter display
-		roundtrip = round(trip, 1)          # rounding trip to 1 decimal in km
-		tripstring = str(roundtrip) + " km" # converting trip to string and add km unit
-		if getstatus[8] == -1:
-			trip = 0.0                  # if trip reset pressed, set trip to 0
-        triplist = [tripstring, scene, trip]       # return list including value and changes.
+    if scene == 2: # scene tripmeter display
+        roundtrip = round(trip, 1)          # rounding trip to 1 decimal in km
+        tripstring = str(roundtrip) + " km" # converting trip to string and add km unit
+        if getstatus[8] == -1:
+            trip = 0.0  # if trip reset pressed, set trip to 0
+        triplist = [tripstring, scene, trip] # return list including value and changes.
         return triplist	
+    
     elif scene == 3: # scene outside air temperature display
         ambient_temp = read_ambient_temperature() # readambient from adc	
         ambientround = round(ambient_temp, 1)     # rounding ambient temp to 1 decimal
-	    ambientstring = str(ambientround) + " c°" # converting ambient temp to string and add unit 
-	    return ambientstring
-
-	elif scene == 4: # scene battery voltage display
-		bat_volt = read_volts_12()           # readvolts from adc 
-		voltage = round(bat_volt, 1)         # make voltages to 1 decimal
-		voltagestring = str(voltage) + " V"  # make voltage as string and add "v"
-		return voltagestring
-
-	elif scene == 5: # scene timer, timer display
-		return "Timer not defined yet."
+        ambientstring = str(ambientround) + " c°" # converting ambient temp to string and add unit 
+        return ambientstring
+    
+    elif scene == 4: # scene battery voltage display
+        bat_volt = read_volts_12()           # readvolts from adc 
+        voltage = round(bat_volt, 1)         # make voltages to 1 decimal
+        voltagestring = str(voltage) + " V"  # make voltage as string and add "v"
+        return voltagestring
+    
+    elif scene == 5: # scene timer, timer display
+        return "Timer not defined yet."
 
     elif scene == 6: # scene bt audio metadata
         return "BT audio not defined yet."  # output string to report bt audio not setted up
