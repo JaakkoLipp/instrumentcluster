@@ -1,5 +1,6 @@
 import time
 import math
+import spi
 from datetime import datetime
 
 CORRECTION = 1 #speedometer CORRECTION value, 1,0 is stock from factory
