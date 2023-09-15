@@ -361,3 +361,8 @@ def scenedrawer(scene, gear_speed_rpm, getstatus, odo, trip): #subprogram output
 		odoround = round(odo, 0)
 		odostring = str(odoround) + " km"
 		return odostring
+
+def shutdownwrite(odo, trip):
+	odowrite(odo)
+	tripwrite(trip)
+	return
