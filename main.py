@@ -6,7 +6,7 @@ import OPi.GPIO as GPIO
 from multiprocessing import Process
 #TODO check if imports needed in subprograms
 
-from flask import Flask, render_template #TODO Jaakko pls check what wrong
+from flask import Flask, render_template #TODO Jaakko pls check what wrong with "flask"
 app = Flask(__name__)
 
 @app.route('/')
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     gear_speed_rpm = get_gear_speed_and_rpm()
     odotime = time.time()
     otherdata = otherdataread()
-    scene = 1
+    scene = 1 #which scene is first to start on poweron
     tripcounter = 0.0
 
 
@@ -56,11 +56,11 @@ if __name__ == '__main__':
             if read_volts_12() <8.0: # Checking again that power is cutted to commit shutdown
                 shutdownwrite(odo, trip)
                 # input shutdown commands here
-		#TODO Jaakko is there need to shut down web server?
+		#TODO Jaakko is there need to shut down web server or anything else?
                 time.sleep(1)
                 os.system("shutdown now -h") # Shutdown OPi. Power cutout after 15seconds
         else:
-            time.sleep(0.02) 
+            time.sleep(0.01) #whileloop speed limiter
         
 
  

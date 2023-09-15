@@ -379,7 +379,7 @@ def scenedrawer(scene, getstatus, odo, trip): #subprogram outputs string which s
 def printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata):
 	speedinkmh = gear_speed_rpm[1] # 2. item in list is speed in km/h
 	speedinms = speedinkmh / 3.6   # convert speed in to m/s
-	deltatime = time.time()-odotime # calculate time difference between 1.st and 2.nd speed sending
+	deltatime = time.time() - odotime # calculate time difference between 1.st and 2.nd speed sending
 	distance = speedinms * deltatime # calculate distance covered in that time with current speed
 	distanceinkm = distance / 1000.0
 	now = datetime.now()  # get time to display
