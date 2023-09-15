@@ -6,8 +6,8 @@ GEAR_SENSITIVITY = 0.10 # How much variability allowed around calculated gear ra
 SPEEDRATIO = 0.779221 # ratio between speed and frequency (how many kmh per hz) for example( 60kmh / 77hz = 0.779221 kmh/hz)
 FRONT_SPROCKET_PULSES_PER_ROTATION = 4 # How many pulses speedsensor sends each rotation of front sprocket
 MULTIPLIER_12V = 1 # Must be defined to run code correctly!!  #TODO check multiplier value
-HIREADLIMIT = 0.6
-LOWREADLIMIT = 0.25
+HIREADLIMIT = 0.6 #adc output value which is minimum for activation of hiread, used for positive voltage input
+LOWREADLIMIT = 0.25 #adc output value which is maximum for activation of lowread, used for ground sensing input
 NIGHTMODETHRESHOLD= 30 #TODO #resistance for nightmode activation threshold
 BUTTONSLEEP = 0.35 #sleeptime to detect long press
 SCENEMAX = 4 #How many changing scenes is available by scene change button
@@ -105,7 +105,7 @@ def read_watertemperature(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-
     data = ((adc[1]&3) << 8) + adc[2]
     spi.close()
     resistance = (data / 1023) * (3.3 * multiplier)
-    temperature = -30.57 * math.log(resistance) + 212.11
+    temperature = -30.57 * math.log(resistance) + 212.11 #function to get temperature from kawasaki stock water temperature sensor
     return temperature
 
 
@@ -118,7 +118,7 @@ def read_reservefuelstate(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-
     data = ((adc[1]&3) << 8) + adc[2]
     spi.close()
     resistance = (data / 1023) * (3.3 * multiplier)
-    if resistance < 22:
+    if resistance < 22: #activation value of reservefuel light 
         reservefuel = 1
     else:
         reservefuel = 0
