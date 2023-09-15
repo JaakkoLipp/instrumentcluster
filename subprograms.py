@@ -271,6 +271,15 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
 
     return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light, sceneshift, longpress])
 
+def otherdataread(): #Outputs list containing [nightmode 1/0, reservefuelstate 1/0, watertemperature string]
+	nightmode = read_ambient_light()           #read ambient light status, 1 or 0
+	reservefuelstate = read_reservefuelstate() # read reservefuel state, 1 or 0
+	watertempint = read_watertemperature()     #read watertemperature
+	watertemprounded = round(watertempint, 0)  # round watertemperature to full number
+	watertempstr = str(watertemprounded) + " c°" # make watertemperature string and add unit
+	outputlist = [nightmode, reservefuelstate, watertempstr] #make output list
+	return outputlist
+	
 
 def odoread():
     with open("odo.txt", "r") as file:
