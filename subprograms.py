@@ -257,7 +257,7 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
         if left_buttonlongpress == left_button:
             longpress = -1 #for long left press. outputs -1
         else:
-            ssceneshift = -1 # for short left press to switch scene left
+            sceneshift = -1 # for short left press to switch scene left
     elif right_button == 1:
         time.sleep(BUTTONSLEEP)
         right_buttonlongpress = read_hi(RIGHT_BUTTON_LIST)
