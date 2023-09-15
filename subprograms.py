@@ -254,9 +254,9 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
     engine_light = read_low(ENGINE_LIGHT_LIST)
     oil_light = read_low(OIL_LIGHT_LIST)
 
-    if left_button == 1:                                        #TODO check button interface
-        time.sleep(BUTTONSLEEP)
-        left_buttonlongpress = read_hi(LEFT_BUTTON_LIST)
+    if left_button == 1:                                                           #current button interface:
+        time.sleep(BUTTONSLEEP)                                                    #sceneshift = left button shortpress (sceneshift == -1)
+        left_buttonlongpress = read_hi(LEFT_BUTTON_LIST)                           #scene reset = left button longpress (longpress == -1)
         if left_buttonlongpress == left_button:
             longpress = -1 #for long left press. outputs -1
         else:

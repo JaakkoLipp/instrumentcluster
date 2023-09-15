@@ -14,7 +14,7 @@ def indexpage():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    #TODO Jaakko pls remove to work: app.run()
+    #TODO Jaakko pls remove this text here for app to work: app.run()
 
     odo = odoread() #datatype kilometers
     trip = tripread() #datatype kilometers
@@ -57,10 +57,10 @@ if __name__ == '__main__':
                 shutdownwrite(odo, trip)
                 # input shutdown commands here
 		#TODO Jaakko is there need to shut down web server?
-                time.sleep(3)
-                os.system("shutdown now -h")
+                time.sleep(1)
+                os.system("shutdown now -h") # Shutdown OPi. Power cutout after 15seconds
         else:
-            time.sleep(0.05) 
+            time.sleep(0.02) 
         
 
  
