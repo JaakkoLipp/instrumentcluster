@@ -362,6 +362,18 @@ def scenedrawer(scene, getstatus, odo, trip): #subprogram outputs string which s
 		odostring = str(odoround) + " km"
 		return odostring
 
+def printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout):
+	speedinkmh = gear_speed_rpm[1] # 2. item in list is speed in km/h
+	speedinms = speedinkmh / 3.6   # convert speed in to m/s
+	deltatime = time.time()-odotime # calculate time difference between 1.st and 2.nd speed sending
+	distance = speedinms * deltatime # calculate distance covered in that time with current speed
+	distanceinkm = distance / 1000.0
+	print(gear_speed_rpm, status, sceneout) #TODO output, Jaakko pls fix!
+	newtime = time.time() # new time for next distance calculation
+	output = [distanceinkm, newtime] # output time for next loop and distance to add to the odo and trip.
+	return output
+	
+
 def shutdownwrite(odo, trip):
 	odowrite(odo)
 	tripwrite(trip)
