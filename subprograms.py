@@ -324,9 +324,7 @@ def sceneshifter(getstatus, scene)
 			scene = scene + 1
 		else:	
 			scene = 1
-		
-	finally:
-		return scene
+		return scene # returns scene which is active after button input
 
 
 def scenedrawer(scene, gear_speed_rpm, getstatus, odo, trip) #subprogram outputs string which should be displayed in changing slot as list, item0 is string and item1 changes to values
