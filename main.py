@@ -6,7 +6,7 @@ import time, os, math, sys #spi #TODO: spi interface and imports
 from multiprocessing import Process
 #TODO check if imports needed in subprograms
 
-from flask import Flask, render_template
+from flask import Flask, render_template #TODO Jaakko pls check what wrong
 app = Flask(__name__)
 
 @app.route('/')
@@ -14,7 +14,7 @@ def indexpage():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    #TODO app.run()
+    #TODO Jaakko pls remove to work: app.run()
 
     odo = odoread() #datatype kilometers
     trip = tripread() #datatype kilometers
@@ -25,7 +25,8 @@ if __name__ == '__main__':
 
 
     while True: 
-        status = getstatus()
+        status = get_status()
+        scene = sceneshifter(status, scene)
         scenereturn = scenedrawer(scene, status, odo, trip)
         sceneout = scenereturn[0] #output string is 1. datapoint in list
         if scene == 2:

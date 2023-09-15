@@ -1,4 +1,6 @@
-
+import time
+import math
+from datetime import datetime
 
 CORRECTION = 1 #speedometer CORRECTION value, 1,0 is stock from factory
 GEAR_RATIO = [2.533, 2.053, 1.737, 1.524, 1.381, 1.304] # gears 1 to 6 ratios
@@ -328,12 +330,14 @@ def tripwrite(trip):
         return
 
 def sceneshifter(getstatus, scene):
-	if getstatus[7] == -1:
-		if scene < SCENEMAX and scene >= 1:
-			scene = scene + 1
-		else:	
-			scene = 1
-		return scene # returns scene which is active after button input
+    if getstatus[7] == -1:
+        if scene < SCENEMAX and scene >= 1:
+            scene = scene + 1
+        else:	
+            scene = 1
+            return scene # returns scene which is active after button input
+    else:
+        return scene # returns scene which is active after button input
 
 
 def scenedrawer(scene, getstatus, odo, trip): #subprogram outputs string which should be displayed in changing slot as list, item0 is string and item1 changes to values
@@ -345,31 +349,31 @@ def scenedrawer(scene, getstatus, odo, trip): #subprogram outputs string which s
         tripstring = str(roundtrip) + " km" # converting trip to string and add km unit
         if getstatus[8] == -1:
             trip = 0.0  # if trip reset pressed, set trip to 0
-        triplist = [tripstring, scene, trip] # return list including value and changes.
+        triplist = [tripstring, trip] # return list including value and changes.
         return triplist	
     
     elif scene == 3: # scene outside air temperature display
         ambient_temp = read_ambient_temperature() # readambient from adc	
         ambientround = round(ambient_temp, 1)     # rounding ambient temp to 1 decimal
         ambientstring = str(ambientround) + " c°" # converting ambient temp to string and add unit 
-        return ambientstring
+        return [ambientstring]
     
     elif scene == 4: # scene battery voltage display
         bat_volt = read_volts_12()           # readvolts from adc 
         voltage = round(bat_volt, 1)         # make voltages to 1 decimal
         voltagestring = str(voltage) + " V"  # make voltage as string and add "v"
-        return voltagestring
+        return [voltagestring]
     
     elif scene == 5: # scene timer, timer display
-        return "Timer not defined yet."
+        return ["Timer not defined yet."]
 
     elif scene == 6: # scene bt audio metadata
-        return "BT audio not defined yet."  # output string to report bt audio not setted up
+        return ["BT audio not defined yet."]  # output string to report bt audio not setted up
 
     else:		 # scene odometer display
         odoround = round(odo, 0)
         odostring = str(odoround) + " km"
-        return odostring
+        return [odostring]
 
 def printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata):
 	speedinkmh = gear_speed_rpm[1] # 2. item in list is speed in km/h
