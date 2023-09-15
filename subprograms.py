@@ -1,6 +1,6 @@
 import time
 import math
-import spi
+#import spi #TODO import spi
 from datetime import datetime
 
 CORRECTION = 1 #speedometer CORRECTION value, 1,0 is stock from factory
@@ -226,9 +226,9 @@ def getrpm():
 
 def get_gear_speed_and_rpm(): #returns list containing [str:gear, int:speed km/h, int:rpm]
     
-    getspeed = getspeed(SPEEDPIN, CORRECTION, SPEEDRATIO)  #gets speed and speed signal frequency
-    speed = getspeed[0]
-    speed_frequency = getspeed[1]
+    speedlist = getspeed()  #gets speed and speed signal frequency
+    speed = speedlist[0]
+    speed_frequency = speedlist[1]
 
     rpm = getrpm(RPM_PIN)   #gets rpm
 

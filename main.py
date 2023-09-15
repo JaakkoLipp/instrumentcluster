@@ -6,12 +6,12 @@ import time, os #spi #TODO: spi interface and imports
 from multiprocessing import Process
 #TODO check if imports needed in subprograms
 
-from flask import Flask, render_template #TODO Jaakko pls check what wrong
-app = Flask(__name__)
+#from flask import Flask, render_template #TODO Jaakko pls check what wrong
+#app = Flask(__name__)
 
-@app.route('/')
-def indexpage():
-    return render_template('index.html')
+#@app.route('/')
+#def indexpage():
+#    return render_template('index.html')
 
 if __name__ == '__main__':
     #TODO Jaakko pls remove to work: app.run()
