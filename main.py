@@ -1,17 +1,17 @@
 from subprograms import *
 from datetime import datetime
 import time, os #spi #TODO: spi interface and imports
-#import OPi.GPIO as GPIO
+import OPi.GPIO as GPIO
 #from machine import I2C
 from multiprocessing import Process
 #TODO check if imports needed in subprograms
 
-#from flask import Flask, render_template #TODO Jaakko pls check what wrong
-#app = Flask(__name__)
+from flask import Flask, render_template #TODO Jaakko pls check what wrong
+app = Flask(__name__)
 
-#@app.route('/')
-#def indexpage():
-#    return render_template('index.html')
+@app.route('/')
+def indexpage():
+    return render_template('index.html')
 
 if __name__ == '__main__':
     #TODO Jaakko pls remove to work: app.run()
@@ -22,6 +22,7 @@ if __name__ == '__main__':
     odotime = time.time()
     otherdata = otherdataread()
     scene = 1
+    tripcounter = 0.0
 
 
     while True: 
@@ -37,13 +38,18 @@ if __name__ == '__main__':
         odo = odo + ododata[0] # 1.st item of list is distance between last two displayed speed 
         trip = trip + ododata[0]
 
+        tripcounter = tripcounter + ododata[0] # After about every full kilometer from starting program, write odo and trip to txt file
+        if tripcounter > 0.5:
+            shutdownwrite(odo, trip)
+            tripcounter = 0.0
+
         otherdata = otherdataread() #read otherdata [nightmode(1/0), reservefuelstate(1/0), watertemperature(str))
 	    
         gear_speed_rpm = get_gear_speed_and_rpm()  # update only gear, speed and rpm data to save process time
         ododata = printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) #output data as printing and returning and calculating trip distance 
         odotime = ododata[1]
         odo = odo + ododata[0]
-        trip = trip + ododata[0] 
+        trip = trip + ododata[0]
     
         if read_volts_12() < 8.0: #checking if power input is below voltagelimit of 8v. If true, shuts instrumentcluster down.
             time.sleep(2)
