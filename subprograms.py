@@ -345,14 +345,13 @@ def scenedrawer(scene, getstatus, odo, trip): #subprogram outputs string which s
 		tripstring = str(roundtrip) + " km" # converting trip to string and add km unit
 		if getstatus[8] == -1:
 			trip = 0.0                  # if trip reset pressed, set trip to 0
-		triplist = [tripstring, scene, trip]       # return list including value and changes.
-		return triplist
-		
+        triplist = [tripstring, scene, trip]       # return list including value and changes.
+        return triplist	
     elif scene == 3: # scene outside air temperature display
-		ambient_temp = read_ambient_temperature() # readambient from adc	
-		ambientround = round(ambient_temp, 1)     # rounding ambient temp to 1 decimal
-		ambientstring = str(ambientround) + " c°" # converting ambient temp to string and add unit 
-		return ambientstring
+        ambient_temp = read_ambient_temperature() # readambient from adc	
+        ambientround = round(ambient_temp, 1)     # rounding ambient temp to 1 decimal
+	    ambientstring = str(ambientround) + " c°" # converting ambient temp to string and add unit 
+	    return ambientstring
 
 	elif scene == 4: # scene battery voltage display
 		bat_volt = read_volts_12()           # readvolts from adc 
@@ -363,13 +362,13 @@ def scenedrawer(scene, getstatus, odo, trip): #subprogram outputs string which s
 	elif scene == 5: # scene timer, timer display
 		return "Timer not defined yet."
 
-	elif scene == 6: # scene bt audio metadata
-		return "BT audio not defined yet."  # output string to report bt audio not setted up
+    elif scene == 6: # scene bt audio metadata
+        return "BT audio not defined yet."  # output string to report bt audio not setted up
 
-	else:		 # scene odometer display
-		odoround = round(odo, 0)
-		odostring = str(odoround) + " km"
-		return odostring
+    else:		 # scene odometer display
+        odoround = round(odo, 0)
+        odostring = str(odoround) + " km"
+        return odostring
 
 def printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata):
 	speedinkmh = gear_speed_rpm[1] # 2. item in list is speed in km/h
