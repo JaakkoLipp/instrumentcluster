@@ -19,6 +19,7 @@ if __name__ == '__main__':
     trip = tripread()
     gear_speed_rpm = get_gear_speed_and_rpm()
     odotime = time.time()
+    otherdata = otherdataread()
     scene = 1
 
 
@@ -29,13 +30,15 @@ if __name__ == '__main__':
         if scene == 2:
             trip = scenereturn[1] #if reset button have been used, scenereturn 2. datapoint is new trip(0.0)
 		
-        ododata = printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout) 
+        ododata = printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) 
 	odotime = ododata[1]
 	odo = odo + ododata[0]
 	trip = trip + ododata[0]
+
+	otherdata = otherdataread()
 	    
         gear_speed_rpm = get_gear_speed_and_rpm()  # update only gear, speed and rpm data to save process time
-        ododata = printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout) 
+        ododata = printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) 
 	odotime = ododata[1]
 	odo = odo + ododata[0]
 	trip = trip + ododata[0] 
