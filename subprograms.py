@@ -156,13 +156,13 @@ def getspeed():
                     if frequency <=4: #at low speeds using smaller sample size for shorter sampling times
                         num_samples = 1
                     elif frequency > 4 and frequency < 8:
-                        num_samples = 2
+                        num_samples = 1
                     elif frequency >= 8 and frequency < 15:
-                        num_samples = 3
+                        num_samples = 2
                     elif frequency >= 15 and frequency < 40:
-                        num_samples = 4
+                        num_samples = 2
                     else:
-                        num_samples = 5
+                        num_samples = 3
                 sampler = 1     # Rising sampler not to run sampler loop again
                 
                 # Exit after a specified number of samples
