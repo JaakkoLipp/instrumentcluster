@@ -18,6 +18,7 @@ if __name__ == '__main__':
     odo = odoread()
     trip = tripread()
     gear_speed_rpm = get_gear_speed_and_rpm()
+    odotime = time.time()
     scene = 1
 
 
@@ -27,9 +28,17 @@ if __name__ == '__main__':
         sceneout = scenereturn[0] #output string is 1. datapoint in list
         if scene == 2:
             trip = scenereturn[1] #if reset button have been used, scenereturn 2. datapoint is new trip(0.0)
-        print(gear_speed_rpm, status, sceneout) 
+		
+        ododata = printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout) 
+	odotime = ododata[1]
+	odo = odo + ododata[0]
+	trip = trip + ododata[0]
+	    
         gear_speed_rpm = get_gear_speed_and_rpm()  # update only gear, speed and rpm data to save process time
-        print(gear_speed_rpm, status, sceneout) 
+        ododata = printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout) 
+	odotime = ododata[1]
+	odo = odo + ododata[0]
+	trip = trip + ododata[0] 
     
         if read_volts_12() < 8.0: #checking if power input is below voltagelimit of 8v. If true, shuts instrumentcluster down.
 	        time.sleep(2)
