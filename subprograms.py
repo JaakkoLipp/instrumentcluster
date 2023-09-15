@@ -318,7 +318,7 @@ def tripwrite(trip):
         print(f"An error occurred with tripwrite: {e}")
         return
 
-def sceneshifter(getstatus, scene)
+def sceneshifter(getstatus, scene):
 	if getstatus[7] == -1:
 		if scene < SCENEMAX and scene >= 1:
 			scene = scene + 1
@@ -327,7 +327,7 @@ def sceneshifter(getstatus, scene)
 		return scene # returns scene which is active after button input
 
 
-def scenedrawer(scene, gear_speed_rpm, getstatus, odo, trip) #subprogram outputs string which should be displayed in changing slot as list, item0 is string and item1 changes to values
+def scenedrawer(scene, gear_speed_rpm, getstatus, odo, trip): #subprogram outputs string which should be displayed in changing slot as list, item0 is string and item1 changes to values
 	#TODO when using scenedrawer, must check for list to reset odo
 	# scenecounter starting from 2 to make odometer default display if error occures
 
