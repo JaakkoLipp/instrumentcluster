@@ -23,6 +23,7 @@ if __name__ == '__main__':
     otherdata = otherdataread()
     scene = 1 #which scene is first to start on poweron
     tripcounter = 0.0
+    GPIO.setwarnings(False) # Sets any warnings off #TODO check if needed to fix
 
 
     while True: 

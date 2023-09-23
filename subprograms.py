@@ -13,11 +13,12 @@ HIREADLIMIT = 0.6 #adc output value which is minimum for activation of hiread, u
 LOWREADLIMIT = 0.25 #adc output value which is maximum for activation of lowread, used for ground sensing input
 NIGHTMODETHRESHOLD= 30 #TODO #resistance for nightmode activation threshold
 BUTTONSLEEP = 0.35 #sleeptime to detect long press
-SCENEMAX = 4 #How many changing scenes is available by scene change button
+SCENEMAX = 5 #How many changing scenes is available by scene change button
 
 #TODO gpio input pins plox check correct
 SPEEDPIN = 1 #speedometer input gpio pin
-RPM_PIN = 2 #rpm input pin
+RPM_PIN= 2 #rpm input pin
+QS_PIN = 3 #gpio output pin for quicshifter controlling, currently 1 for activated and 0 for disabled
 NEUTRAL_LIST = ["/dev/spidev1.0", 5] #neutralpin adc [device, channel 0-7]
 V12_READ_INPUTLIST = ["/dev/spidev1.0", 7] #12v sensing inputpin adc [device, channel 0-7]
 WATERTEMP_INPUT_LIST = ["/dev/spidev1.1", 0, 5] #watertemp inputpin adc [device, channel 0-7], watertemp multiplier by resistance
@@ -334,14 +335,15 @@ def sceneshifter(getstatus, scene):
     if getstatus[7] == -1:
         if scene < SCENEMAX and scene >= 1:
             scene = scene + 1
+            return scene # returns scene which is active after button input
         else:	
             scene = 1
             return scene # returns scene which is active after button input
     else:
-        return scene # returns scene which is active after button input
+        return scene # returns scene which is active without button input
 
 
-def scenedrawer(scene, getstatus, odo, trip): #subprogram outputs string which should be displayed in changing slot as list, item0 is string and item1 changes to values
+def scenedrawer(scene, getstatus, odo, trip, qs_status): #subprogram outputs string which should be displayed in changing slot as list, item0 is string and item1 changes to values
 	#TODO when using scenedrawer, must check for list to reset odo
 	# scenecounter starting from 2 to make odometer default display if error occures
 
@@ -365,10 +367,29 @@ def scenedrawer(scene, getstatus, odo, trip): #subprogram outputs string which s
         voltagestring = str(voltage) + " V"  # make voltage as string and add "v"
         return [voltagestring]
     
-    elif scene == 5: # scene timer, timer display
+    elif scene == 5: # scene for controlling quickshifter status
+        if getstatus[8] == -1:
+            if qs_status == 1:
+                qs_status = 0  # set qs status to 0
+                qs_status_string = "Quickshifter disabled."
+                GPIO.setmode(GPIO.BCM)
+                GPIO.setup(QS_PIN, GPIO.OUT)
+                GPIO.output(QS_PIN, GPIO.LOW)
+            else:
+                qs_status = 1
+                qs_status_string = "Quickshifter enabled."
+                GPIO.setmode(GPIO.BCM)
+                GPIO.setup(QS_PIN, GPIO.OUT)
+                GPIO.output(QS_PIN, GPIO.HIGH)
+        
+        return [qs_status_string]
+        
+
+    
+    elif scene == 6: # scene timer, timer display
         return ["Timer not defined yet."]
 
-    elif scene == 6: # scene bt audio metadata
+    elif scene == 7: # scene bt audio metadata
         return ["BT audio not defined yet."]  # output string to report bt audio not setted up
 
     else:		 # scene odometer display
