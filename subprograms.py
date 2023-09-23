@@ -12,7 +12,7 @@ MULTIPLIER_12V = 1 # Must be defined to run code correctly!!  #TODO check multip
 HIREADLIMIT = 0.6 #adc output value which is minimum for activation of hiread, used for positive voltage input
 LOWREADLIMIT = 0.25 #adc output value which is maximum for activation of lowread, used for ground sensing input
 NIGHTMODETHRESHOLD= 30 #TODO #resistance for nightmode activation threshold
-BUTTONSLEEP = 0.35 #sleeptime to detect long press
+BUTTONSLEEP = 0.8 #sleeptime to detect long press
 SCENEMAX = 5 #How many changing scenes is available by scene change button
 
 #TODO gpio input pins plox check correct
@@ -249,19 +249,28 @@ def get_gear_speed_and_rpm(): #returns list containing [str:gear, int:speed km/h
 def get_status():  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
     blinker_left = read_hi(BLINKER_LEFT_LIST)
     blinker_right = read_hi(BLINKER_RIGHT_LIST)
-    hi_beam = read_hi(HI_BEAM_LIST)
-    left_button = read_hi(LEFT_BUTTON_LIST)
-    right_button = read_hi(RIGHT_BUTTON_LIST)
+    hi_beam = read_hi(HI_BEAM_LIST)                                 #current button interface:
+    left_button = read_hi(LEFT_BUTTON_LIST)                         #sceneshift = left button shortpress (sceneshift == -1)
+    right_button = read_hi(RIGHT_BUTTON_LIST)                       #in scene reset or interact = left button longpress (longpress == -1)
     engine_light = read_low(ENGINE_LIGHT_LIST)
     oil_light = read_low(OIL_LIGHT_LIST)
 
-    if left_button == 1:                                                           #current button interface:
-        time.sleep(BUTTONSLEEP)                                                    #sceneshift = left button shortpress (sceneshift == -1)
-        left_buttonlongpress = read_hi(LEFT_BUTTON_LIST)                           #scene reset = left button longpress (longpress == -1)
-        if left_buttonlongpress == left_button:
-            longpress = -1 #for long left press. outputs -1
+    if left_button == 1:                                                           
+        time.sleep(BUTTONSLEEP / 3)
+        if read_hi(LEFT_BUTTON_LIST) == 1:
+            time.sleep(BUTTONSLEEP / 3)
+            if read_hi(LEFT_BUTTON_LIST) == 1:                                                 
+                time.sleep(BUTTONSLEEP / 3)                                                   
+                left_buttonlongpress = read_hi(LEFT_BUTTON_LIST)                               
+                if left_buttonlongpress == left_button:
+                    longpress = -1 #for long left press. outputs -1
+                else:
+                    sceneshift = -1 # for short left press to switch scene left            
+            else:
+                sceneshift = -1 # for short left press to switch scene left
         else:
             sceneshift = -1 # for short left press to switch scene left
+
     elif right_button == 1:
         time.sleep(BUTTONSLEEP)
         right_buttonlongpress = read_hi(RIGHT_BUTTON_LIST)
@@ -269,6 +278,7 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
             longpress = 1 #for long right press. outputs 1
         else: 
             sceneshift = 1 # for short right press to switch scene right
+            
     else:
         sceneshift = 0 # Sceneshift does not shift scene
         longpress = 0 # No long press detected
@@ -368,21 +378,24 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status): #subprogram outputs str
         return [voltagestring]
     
     elif scene == 5: # scene for controlling quickshifter status
-        if getstatus[8] == -1:
-            if qs_status == 1:
-                qs_status = 0  # set qs status to 0
-                qs_status_string = "Quickshifter disabled."
+        if getstatus[8] == -1: # if left button long press detected
+            if qs_status == 1: # if qs enabled, turn pin low to disable qs and set qs_status = 0
                 GPIO.setmode(GPIO.BCM)
                 GPIO.setup(QS_PIN, GPIO.OUT)
                 GPIO.output(QS_PIN, GPIO.LOW) # set gpio to low for relay to be in active state
                 GPIO.cleanup()
-            else:
-                qs_status = 1
-                qs_status_string = "Quickshifter enabled."
+                qs_status = 0  # set qs status to 0, disabled
+            else:              # if qs diabled, turn pin high to activate qs and set qs_status = 1
                 GPIO.setmode(GPIO.BCM)
                 GPIO.setup(QS_PIN, GPIO.OUT)
                 GPIO.output(QS_PIN, GPIO.HIGH) # set gpio to high for relay to be in not active state
                 GPIO.cleanup()
+                qs_status = 1 #set qs status to 1, activated
+        
+        if qs_status == 1:
+            qs_status_string = "Quickshifter enabled."
+        else: 
+            qs_status_string = "Quickshifter disabled."
         
         return [qs_status_string, qs_status]
         
