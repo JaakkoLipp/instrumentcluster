@@ -23,16 +23,19 @@ if __name__ == '__main__':
     otherdata = otherdataread()
     scene = 1 #which scene is first to start on poweron
     tripcounter = 0.0
+    qs_status = 1
     GPIO.setwarnings(False) # Sets any warnings off #TODO check if needed to fix
 
 
     while True: 
         status = get_status()
         scene = sceneshifter(status, scene)
-        scenereturn = scenedrawer(scene, status, odo, trip)
+        scenereturn = scenedrawer(scene, status, odo, trip, qs_status)
         sceneout = scenereturn[0] #output string is 1. datapoint in list
         if scene == 2:
             trip = scenereturn[1] #if reset button have been used, scenereturn 2. datapoint is new trip(0.0)
+        elif scene == 5:
+            qs_status = scenereturn[1]
 		
         ododata = printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) #output data as printing and returning and calculating trip distance 
         odotime = ododata[1] # 2.nd item of list is time of last measure

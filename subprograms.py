@@ -374,17 +374,17 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status): #subprogram outputs str
                 qs_status_string = "Quickshifter disabled."
                 GPIO.setmode(GPIO.BCM)
                 GPIO.setup(QS_PIN, GPIO.OUT)
-                GPIO.output(QS_PIN, GPIO.LOW)
+                GPIO.output(QS_PIN, GPIO.LOW) # set gpio to low for relay to be in active state
                 GPIO.cleanup()
             else:
                 qs_status = 1
                 qs_status_string = "Quickshifter enabled."
                 GPIO.setmode(GPIO.BCM)
                 GPIO.setup(QS_PIN, GPIO.OUT)
-                GPIO.output(QS_PIN, GPIO.HIGH)
+                GPIO.output(QS_PIN, GPIO.HIGH) # set gpio to high for relay to be in not active state
                 GPIO.cleanup()
         
-        return [qs_status_string]
+        return [qs_status_string, qs_status]
         
 
     
