@@ -13,7 +13,7 @@ HIREADLIMIT = 0.6 #adc output value which is minimum for activation of hiread, u
 LOWREADLIMIT = 0.25 #adc output value which is maximum for activation of lowread, used for ground sensing input
 NIGHTMODETHRESHOLD= 30 #TODO #resistance for nightmode activation threshold
 BUTTONSLEEP = 0.8 #sleeptime to detect long press
-SCENEMAX = 5 #How many changing scenes is available by scene change button
+SCENEMAX = 4 #How many changing scenes is available by scene change button
 
 #TODO gpio input pins plox check correct
 SPEEDPIN = 1 #speedometer input gpio pin
