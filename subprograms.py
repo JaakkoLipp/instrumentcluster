@@ -2,6 +2,7 @@ import time
 import math
 #import spi #TODO import spi
 from datetime import datetime
+import requests
 
 CORRECTION = 1 #speedometer CORRECTION value, 1,0 is stock from factory
 GEAR_RATIO = [2.533, 2.053, 1.737, 1.524, 1.381, 1.304] # gears 1 to 6 ratios
@@ -22,7 +23,7 @@ QS_PIN = 3 #gpio output pin for quicshifter controlling, currently 1 for activat
 NEUTRAL_LIST = ["/dev/spidev1.0", 5] #neutralpin adc [device, channel 0-7]
 V12_READ_INPUTLIST = ["/dev/spidev1.0", 7] #12v sensing inputpin adc [device, channel 0-7]
 WATERTEMP_INPUT_LIST = ["/dev/spidev1.1", 0, 5] #watertemp inputpin adc [device, channel 0-7], watertemp multiplier by resistance
-RESERVEFUEL_INPUT_LIST = [["/dev/spidev1.1", 2, 5]] #reservefuel inputpin adc [device, channel 0-7], reserve fuel state multiplier by resistance
+RESERVEFUEL_INPUT_LIST = ["/dev/spidev1.1", 2, 5] #reservefuel inputpin adc [device, channel 0-7], reserve fuel state multiplier by resistance
 BLINKER_LEFT_LIST = ["/dev/spidev1.0", 0]
 BLINKER_RIGHT_LIST = ["/dev/spidev1.0", 1]
 HI_BEAM_LIST = ["/dev/spidev1.0", 2]
@@ -52,9 +53,9 @@ def read_hi(devicechannellist): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel
     data = ((adc[1]&3) << 8) + adc[2]
     spi.close()
     if data > HIREADLIMIT:
-        finaldata = 1
+        finaldata = True
     else:
-        finaldata = 0
+        finaldata = False
     return finaldata
 
 
@@ -66,9 +67,9 @@ def read_low(devicechannellist): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channe
     data = ((adc[1]&3) << 8) + adc[2]
     spi.close()
     if data < LOWREADLIMIT:
-        finaldata = 1
+        finaldata = True
     else:
-        finaldata = 0
+        finaldata = False
     return finaldata
 
 def read_ambient_light(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
@@ -82,9 +83,9 @@ def read_ambient_light(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     resistance = (data / 1023) * (3.3 * multiplier)
     light_level = resistance #TODO check light level resistance curve to use!!!
     if light_level > NIGHTMODETHRESHOLD:
-        finaldata = 1
+        finaldata = True
     else:
-        finaldata = 0
+        finaldata = False
     return finaldata
 
 def read_ambient_temperature(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
@@ -123,9 +124,9 @@ def read_reservefuelstate(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-
     spi.close()
     resistance = (data / 1023) * (3.3 * multiplier)
     if resistance < 22: #activation value of reservefuel light 
-        reservefuel = 1
+        reservefuel = True
     else:
-        reservefuel = 0
+        reservefuel = False
     return reservefuel
 
 
@@ -233,7 +234,7 @@ def get_gear_speed_and_rpm(): #returns list containing [str:gear, int:speed km/h
 
     rpm = getrpm(RPM_PIN)   #gets rpm
 
-    if (read_low(NEUTRAL_LIST) == 1): #reads if neutral pin low or not. If low N is displayed.
+    if (read_low(NEUTRAL_LIST) == True): #reads if neutral pin low or not. If low N is displayed.
         return (["N", speed, rpm])
     else:
 
@@ -255,11 +256,11 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
     engine_light = read_low(ENGINE_LIGHT_LIST)
     oil_light = read_low(OIL_LIGHT_LIST)
 
-    if left_button == 1:                                                           
+    if left_button == True:                                                           
         time.sleep(BUTTONSLEEP / 3)
-        if read_hi(LEFT_BUTTON_LIST) == 1:
+        if read_hi(LEFT_BUTTON_LIST) == True:
             time.sleep(BUTTONSLEEP / 3)
-            if read_hi(LEFT_BUTTON_LIST) == 1:                                                 
+            if read_hi(LEFT_BUTTON_LIST) == True:                                                 
                 time.sleep(BUTTONSLEEP / 3)                                                   
                 left_buttonlongpress = read_hi(LEFT_BUTTON_LIST)                               
                 if left_buttonlongpress == left_button:
@@ -271,7 +272,7 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
         else:
             sceneshift = -1 # for short left press to switch scene left
 
-    elif right_button == 1:
+    elif right_button == True:
         time.sleep(BUTTONSLEEP)
         right_buttonlongpress = read_hi(RIGHT_BUTTON_LIST)
         if right_buttonlongpress == right_button:
@@ -412,18 +413,23 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status): #subprogram outputs str
         odostring = str(odoround) + " km"
         return [odostring]
 
-def printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata):
-	speedinkmh = gear_speed_rpm[1] # 2. item in list is speed in km/h
-	speedinms = speedinkmh / 3.6   # convert speed in to m/s
-	deltatime = time.time() - odotime # calculate time difference between 1.st and 2.nd speed sending
-	distance = speedinms * deltatime # calculate distance covered in that time with current speed
-	distanceinkm = distance / 1000.0
-	now = datetime.now()  # get time to display
-	dt_string = now.strftime("%H:%M") 
-	print(gear_speed_rpm, status, sceneout, otherdata, dt_string) #TODO output, Jaakko pls fix!
-	newtime = time.time() # new time for next distance calculation
-	output = [distanceinkm, newtime] # output time for next loop and distance to add to the odo and trip.
-	return output
+def send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata):
+    speedinkmh = gear_speed_rpm[1] # 2. item in list is speed in km/h
+    speedinms = speedinkmh / 3.6   # convert speed in to m/s
+    deltatime = time.time() - odotime # calculate time difference between 1.st and 2.nd speed sending
+    distance = speedinms * deltatime # calculate distance covered in that time with current speed
+    distanceinkm = distance / 1000.0
+    now = datetime.now()  # get time to display
+    dt_string = now.strftime("%H:%M")
+    server_input_list = [gear_speed_rpm[0], gear_speed_rpm[1], gear_speed_rpm[2], status[0], status[1], status[2], status[5], status[6], sceneout, dt_string, otherdata[0], otherdata[1], otherdata[3]]
+
+    data = {"GPIOLIST": server_input_list}
+    response = requests.post("localhost:5000/gpiodata", json=data)
+    print("Data sent!!", data)
+
+    newtime = time.time() # new time for next distance calculation
+    output = [distanceinkm, newtime] # output time for next loop and distance to add to the odo and trip.
+    return output
 	
 
 def shutdownwrite(odo, trip):
