@@ -49,11 +49,8 @@ while True:
     if read_volts_12() < 8.0: #checking if power input is below voltagelimit of 8v. If true, shuts instrumentcluster down.
         time.sleep(1)
         if read_volts_12() <8.0: # Checking again that power is cutted to commit shutdown
-            shutdownwrite(odo, trip)
-            # input shutdown commands here
-    #TODO Jaakko is there need to shut down web server or anything else?
+            shutdownwrite(odo, trip)    # input shutdown commands here
             time.sleep(1)
             os.system("shutdown now -h") # Shutdown OPi. Power cutout after 15seconds
     else:
         time.sleep(0.01) #whileloop speed limiter
-        
