@@ -14,7 +14,7 @@ def indexpage():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    #TODO Jaakko pls remove this text here for app to work: app.run()
+    #TODO [Jaakko pls remove this text here for app to work]: app.run()
 
     odo = odoread() #datatype kilometers
     trip = tripread() #datatype kilometers
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         elif scene == 5:
             qs_status = scenereturn[1]
 		
-        ododata = printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) #output data as printing and returning and calculating trip distance 
+        ododata = send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) #output data as printing and returning and calculating trip distance 
         odotime = ododata[1] # 2.nd item of list is time of last measure
         odo = odo + ododata[0] # 1.st item of list is distance between last two displayed speed 
         trip = trip + ododata[0]
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         otherdata = otherdataread() #read otherdata [nightmode(1/0), reservefuelstate(1/0), watertemperature(str))
 	    
         gear_speed_rpm = get_gear_speed_and_rpm()  # update only gear, speed and rpm data to save process time
-        ododata = printdata_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) #output data as printing and returning and calculating trip distance 
+        ododata = send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) #output data as printing and returning and calculating trip distance 
         odotime = ododata[1]
         odo = odo + ododata[0]
         trip = trip + ododata[0]
