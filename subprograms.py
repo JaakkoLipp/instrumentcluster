@@ -3,6 +3,7 @@ import math
 #import spi #TODO import spi
 from datetime import datetime
 import requests
+import RPi.GPIO as GPIO
 
 CORRECTION = 1 #speedometer CORRECTION value, 1,0 is stock from factory
 GEAR_RATIO = [2.533, 2.053, 1.737, 1.524, 1.381, 1.304] # gears 1 to 6 ratios
