@@ -132,7 +132,7 @@ def read_reservefuelstate(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-
 
 def getspeed():
     # Set up GPIO
-    GPIO.setmode(GPIO.BCM)
+    GPIO.setmode(GPIO.BOARD)
     GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     # Initialize variables
