@@ -18,9 +18,9 @@ BUTTONSLEEP = 0.8 #sleeptime to detect long press
 SCENEMAX = 4 #How many changing scenes is available by scene change button
 
 #TODO gpio input pins plox check correct
-SPEEDPIN = 1 #speedometer input gpio pin
-RPM_PIN= 2 #rpm input pin
-QS_PIN = 3 #gpio output pin for quicshifter controlling, currently 1 for activated and 0 for disabled
+SPEEDPIN = 36 #speedometer input gpio pin
+RPM_PIN= 37 #rpm input pin
+QS_PIN = 23 #gpio output pin for quicshifter controlling, currently 1 for activated and 0 for disabled
 NEUTRAL_LIST = ["/dev/spidev1.0", 5] #neutralpin adc [device, channel 0-7]
 V12_READ_INPUTLIST = ["/dev/spidev1.0", 7] #12v sensing inputpin adc [device, channel 0-7]
 WATERTEMP_INPUT_LIST = ["/dev/spidev1.1", 0, 5] #watertemp inputpin adc [device, channel 0-7], watertemp multiplier by resistance
