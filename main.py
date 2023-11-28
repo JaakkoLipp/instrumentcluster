@@ -1,9 +1,9 @@
 from subprograms import *
 from datetime import datetime
 import time, os #spi #TODO: spi interface and imports
-import OPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 #from machine import I2C
-from multiprocessing import Process
+
 #TODO check if imports needed in subprograms
 
 
