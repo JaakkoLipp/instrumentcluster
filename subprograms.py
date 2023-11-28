@@ -2,10 +2,12 @@ import time
 import math
 #import spi #TODO import spi
 from datetime import datetime
-import requests
+import requests # For frontend data transfer
 import RPi.GPIO as GPIO
 
-def read_volts_12(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+
+
+def read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = V12_READ_INPUTLIST[0]
     channel = V12_READ_INPUTLIST[1]
     status = spi.openSPI(device, speed=1000000)
@@ -16,7 +18,7 @@ def read_volts_12(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     return finaldata
 
 
-def read_hi(devicechannellist): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+def read_hi(devicechannellist, HIREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = devicechannellist[0]
     channel = devicechannellist[1]
     status = spi.openSPI(device, speed=1000000)
@@ -30,7 +32,7 @@ def read_hi(devicechannellist): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel
     return finaldata
 
 
-def read_low(devicechannellist): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+def read_low(devicechannellist, LOWREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = devicechannellist[0]
     channel = devicechannellist[1]
     status = spi.openSPI(device, speed=1000000)
@@ -43,7 +45,7 @@ def read_low(devicechannellist): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channe
         finaldata = False
     return finaldata
 
-def read_ambient_light(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = AMBIENT_LIGHT_LIST[0]
     channel = AMBIENT_LIGHT_LIST[1]
     multiplier = AMBIENT_LIGHT_LIST[2]
@@ -59,7 +61,7 @@ def read_ambient_light(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
         finaldata = False
     return finaldata
 
-def read_ambient_temperature(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+def read_ambient_temperature(AMBIENT_TEMP_LIST): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = AMBIENT_TEMP_LIST[0]
     channel = AMBIENT_TEMP_LIST[1]
     multiplier = AMBIENT_TEMP_LIST[2]
@@ -72,7 +74,7 @@ def read_ambient_temperature(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel
     return temperature
 
 
-def read_watertemperature(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+def read_watertemperature(WATERTEMP_INPUT_LIST): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = WATERTEMP_INPUT_LIST[0]
     channel = WATERTEMP_INPUT_LIST[1]
     multiplier = WATERTEMP_INPUT_LIST[2]
@@ -85,7 +87,7 @@ def read_watertemperature(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-
     return temperature
 
 
-def read_reservefuelstate(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     device = RESERVEFUEL_INPUT_LIST[0]
     channel = RESERVEFUEL_INPUT_LIST[1]
     multiplier = RESERVEFUEL_INPUT_LIST[2]
@@ -101,7 +103,7 @@ def read_reservefuelstate(): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-
     return reservefuel
 
 
-def getspeed():
+def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     # Set up GPIO
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -158,10 +160,10 @@ def getspeed():
         return [corrected_speed, final_frequency]
     
 
-def getrpm():
+def getrpm(RPM_PIN):
     # Set up GPIO
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     # Initialize variables
     falling_edges = 0
@@ -197,15 +199,15 @@ def getrpm():
     
     
 
-def get_gear_speed_and_rpm(): #returns list containing [str:gear, int:speed km/h, int:rpm]
+def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION): #returns list containing [str:gear, int:speed km/h, int:rpm]
     
-    speedlist = getspeed()  #gets speed and speed signal frequency
+    speedlist = getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION)  #gets speed and speed signal frequency
     speed = speedlist[0]
     speed_frequency = speedlist[1]
 
     rpm = getrpm(RPM_PIN)   #gets rpm
 
-    if (read_low(NEUTRAL_LIST) == True): #reads if neutral pin low or not. If low N is displayed.
+    if (read_low(NEUTRAL_LIST, LOWREADLIMIT) == True): #reads if neutral pin low or not. If low N is displayed.
         return (["N", speed, rpm])
     else:
 
@@ -218,22 +220,22 @@ def get_gear_speed_and_rpm(): #returns list containing [str:gear, int:speed km/h
         return (["-", speed, rpm])
     
 
-def get_status():  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
-    blinker_left = read_hi(BLINKER_LEFT_LIST)
-    blinker_right = read_hi(BLINKER_RIGHT_LIST)
-    hi_beam = read_hi(HI_BEAM_LIST)                                 #current button interface:
-    left_button = read_hi(LEFT_BUTTON_LIST)                         #sceneshift = left button shortpress (sceneshift == -1)
-    right_button = read_hi(RIGHT_BUTTON_LIST)                       #in scene reset or interact = left button longpress (longpress == -1)
-    engine_light = read_low(ENGINE_LIGHT_LIST)
-    oil_light = read_low(OIL_LIGHT_LIST)
+def get_status(BLINKER_LEFT_LIST, BLINKER_RIGHT_LIST,HI_BEAM_LIST, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_LIST, OIL_LIGHT_LIST, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
+    blinker_left = read_hi(BLINKER_LEFT_LIST, HIREADLIMIT)
+    blinker_right = read_hi(BLINKER_RIGHT_LIST, HIREADLIMIT)
+    hi_beam = read_hi(HI_BEAM_LIST, HIREADLIMIT)                                 #current button interface:
+    left_button = read_hi(LEFT_BUTTON_LIST, HIREADLIMIT)                         #sceneshift = left button shortpress (sceneshift == -1)
+    right_button = read_hi(RIGHT_BUTTON_LIST, HIREADLIMIT)                       #in scene reset or interact = left button longpress (longpress == -1)
+    engine_light = read_low(ENGINE_LIGHT_LIST, LOWREADLIMIT)
+    oil_light = read_low(OIL_LIGHT_LIST, LOWREADLIMIT)
 
     if left_button == True:                                                           
         time.sleep(BUTTONSLEEP / 3)
-        if read_hi(LEFT_BUTTON_LIST) == True:
+        if read_hi(LEFT_BUTTON_LIST, HIREADLIMIT) == True:
             time.sleep(BUTTONSLEEP / 3)
-            if read_hi(LEFT_BUTTON_LIST) == True:                                                 
+            if read_hi(LEFT_BUTTON_LIST, HIREADLIMIT) == True:                                                 
                 time.sleep(BUTTONSLEEP / 3)                                                   
-                left_buttonlongpress = read_hi(LEFT_BUTTON_LIST)                               
+                left_buttonlongpress = read_hi(LEFT_BUTTON_LIST, HIREADLIMIT)                               
                 if left_buttonlongpress == left_button:
                     longpress = -1 #for long left press. outputs -1
                 else:
@@ -245,8 +247,7 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
 
     elif right_button == True:
         time.sleep(BUTTONSLEEP)
-        right_buttonlongpress = read_hi(RIGHT_BUTTON_LIST)
-        if right_buttonlongpress == right_button:
+        if True == read_hi(RIGHT_BUTTON_LIST, HIREADLIMIT):
             longpress = 1 #for long right press. outputs 1
         else: 
             sceneshift = 1 # for short right press to switch scene right
@@ -257,10 +258,10 @@ def get_status():  # status output 9 segment list: [blinker left, blinker right,
 
     return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light, sceneshift, longpress])
 
-def otherdataread(): #Outputs list containing [nightmode 1/0, reservefuelstate 1/0, watertemperature string]
-	nightmode = read_ambient_light()           #read ambient light status, 1 or 0
-	reservefuelstate = read_reservefuelstate() # read reservefuel state, 1 or 0
-	watertempint = read_watertemperature()     #read watertemperature
+def otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST): #Outputs list containing [nightmode 1/0, reservefuelstate 1/0, watertemperature string]
+	nightmode = read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD)           #read ambient light status, 1 or 0
+	reservefuelstate = read_reservefuelstate(RESERVEFUEL_INPUT_LIST) # read reservefuel state, 1 or 0
+	watertempint = read_watertemperature(WATERTEMP_INPUT_LIST)     #read watertemperature
 	watertemprounded = round(watertempint, 0)  # round watertemperature to full number
 	watertempstr = str(watertemprounded) + " c°" # make watertemperature string and add unit
 	outputlist = [nightmode, reservefuelstate, watertempstr] #make output list
@@ -313,7 +314,7 @@ def tripwrite(trip):
         print(f"An error occurred with tripwrite: {e}")
         return
 
-def sceneshifter(getstatus, scene):
+def sceneshifter(getstatus, scene, SCENEMAX):
     if getstatus[7] == -1:
         if scene < SCENEMAX and scene >= 1:
             scene = scene + 1
@@ -325,7 +326,7 @@ def sceneshifter(getstatus, scene):
         return scene # returns scene which is active without button input
 
 
-def scenedrawer(scene, getstatus, odo, trip, qs_status): #subprogram outputs string which should be displayed in changing slot as list, item0 is string and item1 changes to values
+def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_LIST): #subprogram outputs string which should be displayed in changing slot as list, item0 is string and item1 changes to values
 	#TODO when using scenedrawer, must check for list to reset odo
 	# scenecounter starting from 2 to make odometer default display if error occures
 
@@ -338,13 +339,13 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status): #subprogram outputs str
         return triplist	
     
     elif scene == 3: # scene outside air temperature display
-        ambient_temp = read_ambient_temperature() # readambient from adc	
+        ambient_temp = read_ambient_temperature(AMBIENT_TEMP_LIST) # readambient from adc	
         ambientround = round(ambient_temp, 1)     # rounding ambient temp to 1 decimal
         ambientstring = str(ambientround) + " c°" # converting ambient temp to string and add unit 
         return [ambientstring]
     
     elif scene == 4: # scene battery voltage display
-        bat_volt = read_volts_12()           # readvolts from adc 
+        bat_volt = read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V)           # readvolts from adc 
         voltage = round(bat_volt, 1)         # make voltages to 1 decimal
         voltagestring = str(voltage) + " V"  # make voltage as string and add "v"
         return [voltagestring]
