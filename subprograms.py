@@ -157,8 +157,6 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     
     finally:
         GPIO.cleanup()
-        if corrected_speed == None:
-            corrected_speed = 0
         return [corrected_speed, final_frequency]
     
 
