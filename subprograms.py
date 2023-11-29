@@ -123,6 +123,7 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
             
             
             if GPIO.wait_for_edge(SPEEDPIN, GPIO.FALLING, timeout=260) is None:  #if timeout occures, return speed 0
+                print("exited before getspeed loop")
                 return [0, 0] 
             # Measure time between falling edges
             if prev_time is not None:
@@ -145,6 +146,7 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
                 
                 # Exit after a specified number of samples
                 if falling_edges >= num_samples:
+                    print("calculating speed in getspeed")
                     final_frequency = sum(frequencies) / len(frequencies)
                     speed = final_frequency * SPEEDRATIO  # Converting frequency to kmh using speed ratio
                     corrected_speed = speed * CORRECTION # Correcting speed for known measuring error
@@ -157,6 +159,7 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     
     finally:
         GPIO.cleanup()
+        print("gpio cleanup in getspeed")
         return [corrected_speed, final_frequency]
     
 
