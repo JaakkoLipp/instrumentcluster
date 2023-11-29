@@ -1,6 +1,6 @@
 import time
 import math
-#import spi #TODO import spi
+import spidev
 from datetime import datetime
 import requests # For frontend data transfer
 import RPi.GPIO as GPIO
