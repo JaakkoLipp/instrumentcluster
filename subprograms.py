@@ -124,7 +124,7 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
             
             if GPIO.wait_for_edge(SPEEDPIN, GPIO.FALLING, timeout=260) is None:  #if timeout occures, return speed 0
                 print("exited before getspeed loop")
-                return [0, 0] 
+                return([0, 0]) 
             # Measure time between falling edges
             if prev_time is not None:
                 time_difference = time.time() - prev_time
