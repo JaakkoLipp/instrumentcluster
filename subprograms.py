@@ -124,6 +124,7 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
             
             if GPIO.wait_for_edge(SPEEDPIN, GPIO.FALLING, timeout=260) is None:  #if timeout occures, return speed 0
                 print("exited before getspeed loop")
+                GPIO.cleanup()
                 return [0, 0]
             # Measure time between falling edges
             if prev_time is not None:
@@ -165,7 +166,7 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
 
 def getrpm(RPM_PIN):
     # Set up GPIO
-    GPIO.setmode(GPIO.BCM)
+    GPIO.setmode(GPIO.BOARD)
     GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     # Initialize variables
@@ -179,6 +180,7 @@ def getrpm(RPM_PIN):
             # Wait for the first falling edge
             if GPIO.wait_for_edge(RPM_PIN, GPIO.FALLING, timeout=60) is None:  #if timeout occures, return rpm 0 and times out if rpm is lower than 500
                 rpm = 0
+                GPIO.cleanup()
                 return rpm 
             
             # Measure time between falling edges
