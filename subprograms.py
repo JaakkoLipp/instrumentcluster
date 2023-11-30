@@ -1,4 +1,6 @@
 import RPi.GPIO as GPIO
+import spidev
+
 
 def analog_read(channel):
     r = spi.xfer2([1, (8 + channel) << 4, 0])
