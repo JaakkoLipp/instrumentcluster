@@ -378,8 +378,7 @@ def send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata)
     deltatime = time.time() - odotime # calculate time difference between 1.st and 2.nd speed sending
     distance = speedinms * deltatime # calculate distance covered in that time with current speed
     distanceinkm = distance / 1000.0
-    now = datetime.now()  # get time to display
-    dt_string = now.strftime("%H:%M")
+    dt_string = time.strftime("%H:%M") #Time to display
     server_input_list = [gear_speed_rpm[0], gear_speed_rpm[1], gear_speed_rpm[2], status[0], status[1], status[2], status[5], status[6], sceneout, dt_string, otherdata[0], otherdata[1], otherdata[3]]
 
     data = {"GPIOLIST": server_input_list}
