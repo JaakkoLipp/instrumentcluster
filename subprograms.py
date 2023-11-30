@@ -1,4 +1,4 @@
-import time, math, datetime, mcp3008
+
 
 def read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     with mcp3008.MCP3008() as adc:
