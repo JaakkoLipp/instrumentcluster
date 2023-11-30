@@ -3,6 +3,8 @@ import spidev
 
 
 def analog_read(channel):
+    spi = spidev.SpiDev()
+    spi.open(0, 0)
     r = spi.xfer2([1, (8 + channel) << 4, 0])
     adc_out = ((r[1]&3) << 8) + r[2]
     return adc_out
