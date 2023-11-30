@@ -1,30 +1,15 @@
-import time
-import math
-import spidev
-from datetime import datetime
-import requests # For frontend data transfer
-import RPi.GPIO as GPIO
-
-
+import time, math, datetime, mcp3008
 
 def read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    device = V12_READ_INPUTLIST[0]
-    channel = V12_READ_INPUTLIST[1]
-    status = spi.openSPI(device, speed=1000000)
-    adc = spi.transfer((1,(8+channel)<<4,0))
-    data = ((adc[1]&3) << 8) + adc[2]
-    spi.close()
+    with mcp3008.MCP3008() as adc:
+        data = (adc.read([V12_READ_INPUTLIST]))
     finaldata = (data / 1023) * (3.3 * MULTIPLIER_12V)
     return finaldata
 
 
-def read_hi(devicechannellist, HIREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    device = devicechannellist[0]
-    channel = devicechannellist[1]
-    status = spi.openSPI(device, speed=1000000)
-    adc = spi.transfer((1,(8+channel)<<4,0))
-    data = ((adc[1]&3) << 8) + adc[2]
-    spi.close()
+def read_hi(channellist, HIREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+    with mcp3008.MCP3008() as adc:
+        data = (adc.read([channellist]))
     if data > HIREADLIMIT:
         finaldata = True
     else:
@@ -32,13 +17,9 @@ def read_hi(devicechannellist, HIREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1
     return finaldata
 
 
-def read_low(devicechannellist, LOWREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    device = devicechannellist[0]
-    channel = devicechannellist[1]
-    status = spi.openSPI(device, speed=1000000)
-    adc = spi.transfer((1,(8+channel)<<4,0))
-    data = ((adc[1]&3) << 8) + adc[2]
-    spi.close()
+def read_low(channellist, LOWREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
+   with mcp3008.MCP3008() as adc:
+        data = (adc.read([channellist]))
     if data < LOWREADLIMIT:
         finaldata = True
     else:
@@ -46,13 +27,9 @@ def read_low(devicechannellist, LOWREADLIMIT): #"/dev/spidev1.0" tai "/dev/spide
     return finaldata
 
 def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    device = AMBIENT_LIGHT_LIST[0]
-    channel = AMBIENT_LIGHT_LIST[1]
-    multiplier = AMBIENT_LIGHT_LIST[2]
-    status = spi.openSPI(device, speed=1000000)
-    adc = spi.transfer((1,(8+channel)<<4,0))
-    data = ((adc[1]&3) << 8) + adc[2]
-    spi.close()
+    multiplier = 10
+    with mcp3008.MCP3008() as adc:
+        data = (adc.read([AMBIENT_LIGHT_LIST]))
     resistance = (data / 1023) * (3.3 * multiplier)
     light_level = resistance #TODO check light level resistance curve to use!!!
     if light_level > NIGHTMODETHRESHOLD:
@@ -62,39 +39,27 @@ def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): #"/dev/spidev1.0
     return finaldata
 
 def read_ambient_temperature(AMBIENT_TEMP_LIST): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    device = AMBIENT_TEMP_LIST[0]
-    channel = AMBIENT_TEMP_LIST[1]
-    multiplier = AMBIENT_TEMP_LIST[2]
-    status = spi.openSPI(device, speed=1000000)
-    adc = spi.transfer((1,(8+channel)<<4,0))
-    data = ((adc[1]&3) << 8) + adc[2]
-    spi.close()
+    multiplier = 10
+    with mcp3008.MCP3008() as adc:
+        data = (adc.read(AMBIENT_TEMP_LIST))
     resistance = (data / 1023) * (3.3 * multiplier)
     temperature = resistance #TODO check ambient temperature probe resistance curve to use!!!
     return temperature
 
 
 def read_watertemperature(WATERTEMP_INPUT_LIST): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    device = WATERTEMP_INPUT_LIST[0]
-    channel = WATERTEMP_INPUT_LIST[1]
-    multiplier = WATERTEMP_INPUT_LIST[2]
-    status = spi.openSPI(device, speed=1000000)
-    adc = spi.transfer((1,(8+channel)<<4,0))
-    data = ((adc[1]&3) << 8) + adc[2]
-    spi.close()
+    multiplier =  10
+    with mcp3008.MCP3008() as adc:
+        data = (adc.read(WATERTEMP_INPUT_LIST))
     resistance = (data / 1023) * (3.3 * multiplier)
     temperature = -30.57 * math.log(resistance) + 212.11 #function to get temperature from kawasaki stock water temperature sensor
     return temperature
 
 
 def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    device = RESERVEFUEL_INPUT_LIST[0]
-    channel = RESERVEFUEL_INPUT_LIST[1]
-    multiplier = RESERVEFUEL_INPUT_LIST[2]
-    status = spi.openSPI(device, speed=1000000)
-    adc = spi.transfer((1,(8+channel)<<4,0))
-    data = ((adc[1]&3) << 8) + adc[2]
-    spi.close()
+    multiplier = 10
+    with mcp3008.MCP3008() as adc:
+        data = (adc.read(RESERVEFUEL_INPUT_LIST))
     resistance = (data / 1023) * (3.3 * multiplier)
     if resistance < 22: #activation value of reservefuel light 
         reservefuel = True
@@ -102,6 +67,17 @@ def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): #"/dev/spidev1.0" tai "/dev/s
         reservefuel = False
     return reservefuel
 
+
+def readstate(inputpin):
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(inputpin, GPIO.OUT)
+    GPIO.output(inputpin, GPIO.LOW)
+    state = GPIO.input(inputpin)
+    if state == HIGH:
+        return True
+    else:
+        return False
+    
 
 def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     # Set up GPIO
@@ -114,6 +90,7 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     frequencies = []
     num_samples = 1
     sampler = 0
+    loop_stop = False
 
     if CORRECTION == None:
         CORRECTION = 1.0
@@ -151,17 +128,15 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
                     final_frequency = sum(frequencies) / len(frequencies)
                     speed = final_frequency * SPEEDRATIO  # Converting frequency to kmh using speed ratio
                     corrected_speed = speed * CORRECTION # Correcting speed for known measuring error
-                    break
+                    GPIO.cleanup()
+                    print("gpio cleanup in getspeed")
+                    return [corrected_speed, final_frequency]
             
             prev_time = time.time()
     
     except KeyboardInterrupt:
         pass
     
-    
-    GPIO.cleanup()
-    print("gpio cleanup in getspeed")
-    return [corrected_speed, final_frequency]
     
 
 def getrpm(RPM_PIN):
@@ -225,14 +200,16 @@ def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIST, FRONT_SPROCKET_PULSES_PER_ROTA
         return (["-", speed, rpm])
     
 
-def get_status(BLINKER_LEFT_LIST, BLINKER_RIGHT_LIST,HI_BEAM_LIST, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_LIST, OIL_LIGHT_LIST, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
-    blinker_left = read_hi(BLINKER_LEFT_LIST, HIREADLIMIT)
-    blinker_right = read_hi(BLINKER_RIGHT_LIST, HIREADLIMIT)
-    hi_beam = read_hi(HI_BEAM_LIST, HIREADLIMIT)                                 #current button interface:
+def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
+    blinker_left = readstate(BLINKER_LEFT_PIN)
+    blinker_right = readstate(BLINKER_RIGHT_PIN)
+    hi_beam = readstate(HI_BEAM_PIN)                                 #current button interface:
     left_button = read_hi(LEFT_BUTTON_LIST, HIREADLIMIT)                         #sceneshift = left button shortpress (sceneshift == -1)
     right_button = read_hi(RIGHT_BUTTON_LIST, HIREADLIMIT)                       #in scene reset or interact = left button longpress (longpress == -1)
-    engine_light = read_low(ENGINE_LIGHT_LIST, LOWREADLIMIT)
-    oil_light = read_low(OIL_LIGHT_LIST, LOWREADLIMIT)
+    engine_light = readstate(ENGINE_LIGHT_PIN)
+    oil_light = readstate(OIL_LIGHT_PIN)
+
+    
 
     if left_button == True:                                                           
         time.sleep(BUTTONSLEEP / 3)

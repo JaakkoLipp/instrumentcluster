@@ -1,10 +1,10 @@
 from subprograms import *
-from datetime import datetime
 import time, os #spi #TODO: spi interface and imports
 import RPi.GPIO as GPIO
-#from machine import I2C
-
-#TODO check if imports needed in subprograms
+import math
+from datetime import datetime
+import requests # For frontend data transfer
+import mcp3008
 
 CORRECTION = 1 #speedometer CORRECTION value, 1,0 is stock from factory
 GEAR_RATIO = [2.533, 2.053, 1.737, 1.524, 1.381, 1.304] # gears 1 to 6 ratios
@@ -18,23 +18,31 @@ NIGHTMODETHRESHOLD= 30 #TODO #resistance for nightmode activation threshold
 BUTTONSLEEP = 0.8 #sleeptime to detect long press
 SCENEMAX = 4 #How many changing scenes is available by scene change button
 
+# gpio pins:
+
+SPEEDPIN = 29 #speedometer input gpio pin
+RPM_PIN= 31 #rpm input pin
+QS_PIN = 33 #gpio output pin for quicshifter controlling, currently 1 for activated and 0 for disabled
+
+BLINKER_LEFT_PIN = 11
+BLINKER_RIGHT_PIN = 13
+HI_BEAM_PIN = 15
+ENGINE_LIGHT_PIN = 16
+OIL_LIGHT_PIN = 18
+
+
 #TODO gpio input pins plox check correct
-SPEEDPIN = 36 #speedometer input gpio pin
-RPM_PIN= 37 #rpm input pin
-QS_PIN = 23 #gpio output pin for quicshifter controlling, currently 1 for activated and 0 for disabled
-NEUTRAL_LIST = ["/dev/spidev1.0", 5] #neutralpin adc [device, channel 0-7]
-V12_READ_INPUTLIST = ["/dev/spidev1.0", 7] #12v sensing inputpin adc [device, channel 0-7]
-WATERTEMP_INPUT_LIST = ["/dev/spidev1.1", 0, 5] #watertemp inputpin adc [device, channel 0-7], watertemp multiplier by resistance
-RESERVEFUEL_INPUT_LIST = ["/dev/spidev1.1", 2, 5] #reservefuel inputpin adc [device, channel 0-7], reserve fuel state multiplier by resistance
-BLINKER_LEFT_LIST = ["/dev/spidev1.0", 0]
-BLINKER_RIGHT_LIST = ["/dev/spidev1.0", 1]
-HI_BEAM_LIST = ["/dev/spidev1.0", 2]
-LEFT_BUTTON_LIST = ["/dev/spidev1.0", 3]
-RIGHT_BUTTON_LIST = ["/dev/spidev1.0", 4]
-ENGINE_LIGHT_LIST = ["/dev/spidev1.0", 6]
-OIL_LIGHT_LIST = ["/dev/spidev1.1", 3]
-AMBIENT_LIGHT_LIST = ["/dev/spidev1.1", 1, 5] #ambientlight resistor inputpin adc [device, channel 0-7], ambient light multiplier by resistance
-AMBIENT_TEMP_LIST = ["/dev/spidev1.1", 4, 5]  #ambient temperature resistor inputpin adc [device, channel 0-7], ambient temp multiplier by resistance
+
+#mcp3008 pins from 0-7
+
+V12_READ_INPUTLIST = mcp3008.CH0 #12v sensing inputpin adc [channel 0-7]
+WATERTEMP_INPUT_LIST = mcp3008.CH1 #watertemp inputpin adc [channel 0-7], watertemp multiplier by resistance, defined in subprogarams
+RESERVEFUEL_INPUT_LIST = mcp3008.CH2 #reservefuel inputpin adc [channel 0-7], reserve fuel state multiplier by resistance
+AMBIENT_LIGHT_LIST = mcp3008.CH3 #ambientlight resistor inputpin adc [channel 0-7], ambient light multiplier by resistance
+AMBIENT_TEMP_LIST = mcp3008.CH4 #ambient temperature resistor inputpin adc [channel 0-7], ambient temp multiplier by resistance
+LEFT_BUTTON_LIST = mcp3008.CH5
+RIGHT_BUTTON_LIST = mcp3008.CH6
+NEUTRAL_LIST = mcp3008.CH7 #neutralpin adc [device, channel 0-7]
 
 
 odo = odoread() #datatype kilometers
