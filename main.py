@@ -1,5 +1,5 @@
 from subprograms import *
-import time, os #spi #TODO: spi interface and imports
+import time, os
 import RPi.GPIO as GPIO
 import math
 from datetime import datetime
@@ -83,11 +83,11 @@ while True:
     odo = odo + ododata[0]
     trip = trip + ododata[0]
 
-    #if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) < 8.0: #checking if power input is below voltagelimit of 8v. If true, shuts instrumentcluster down.
-    #    time.sleep(1)
-    #    if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) <8.0: # Checking again that power is cutted to commit shutdown
-    #        shutdownwrite(odo, trip)    # input shutdown commands here
-    #        time.sleep(1)
-    #        os.system("shutdown now -h") # Shutdown RPi. Power cutout after 15seconds
-    #else:
-    time.sleep(0.01) #whileloop speed limiter
+    if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) < 8.0: #checking if power input is below voltagelimit of 8v. If true, shuts instrumentcluster down.
+        time.sleep(1)
+        if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) <8.0: # Checking again that power is cutted to commit shutdown
+            shutdownwrite(odo, trip)    # input shutdown commands here
+            time.sleep(1)
+            os.system("shutdown now -h") # Shutdown RPi. Power cutout after 15seconds
+    else:
+        time.sleep(0.01) #whileloop speed limiter
