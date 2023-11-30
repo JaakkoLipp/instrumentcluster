@@ -1,3 +1,5 @@
+import RPi.GPIO as GPIO
+
 def analog_read(channel):
     r = spi.xfer2([1, (8 + channel) << 4, 0])
     adc_out = ((r[1]&3) << 8) + r[2]
