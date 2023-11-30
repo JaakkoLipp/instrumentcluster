@@ -35,14 +35,14 @@ OIL_LIGHT_PIN = 18
 
 #mcp3008 pins from 0-7
 
-V12_READ_INPUTLIST = mcp3008.CH0 #12v sensing inputpin adc [channel 0-7]
-WATERTEMP_INPUT_LIST = mcp3008.CH1 #watertemp inputpin adc [channel 0-7], watertemp multiplier by resistance, defined in subprogarams
-RESERVEFUEL_INPUT_LIST = mcp3008.CH2 #reservefuel inputpin adc [channel 0-7], reserve fuel state multiplier by resistance
-AMBIENT_LIGHT_LIST = mcp3008.CH3 #ambientlight resistor inputpin adc [channel 0-7], ambient light multiplier by resistance
-AMBIENT_TEMP_LIST = mcp3008.CH4 #ambient temperature resistor inputpin adc [channel 0-7], ambient temp multiplier by resistance
-LEFT_BUTTON_LIST = mcp3008.CH5
-RIGHT_BUTTON_LIST = mcp3008.CH6
-NEUTRAL_LIST = mcp3008.CH7 #neutralpin adc [device, channel 0-7]
+V12_READ_INPUTLIST = 0 #12v sensing inputpin adc [channel 0-7]
+WATERTEMP_INPUT_LIST = 1 #watertemp inputpin adc [channel 0-7], watertemp multiplier by resistance, defined in subprogarams
+RESERVEFUEL_INPUT_LIST = 2 #reservefuel inputpin adc [channel 0-7], reserve fuel state multiplier by resistance
+AMBIENT_LIGHT_LIST = 3 #ambientlight resistor inputpin adc [channel 0-7], ambient light multiplier by resistance
+AMBIENT_TEMP_LIST = 4 #ambient temperature resistor inputpin adc [channel 0-7], ambient temp multiplier by resistance
+LEFT_BUTTON_LIST = 5
+RIGHT_BUTTON_LIST = 6
+NEUTRAL_LIST = 7 #neutralpin adc [device, channel 0-7]
 
 
 odo = odoread() #datatype kilometers
@@ -58,7 +58,7 @@ spi = spidev.SpiDev()
 spi.open(0, 0)
 
 while True: 
-    status = get_status(BLINKER_LEFT_LIST, BLINKER_RIGHT_LIST,HI_BEAM_LIST, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_LIST, OIL_LIGHT_LIST, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT)
+    status = get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_LIST, OIL_LIGHT_LIST, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT)
     scene = sceneshifter(status, scene, SCENEMAX)
     scenereturn = scenedrawer(scene, status, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_LIST)
     sceneout = scenereturn[0] #output string is 1. datapoint in list, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_LIST
