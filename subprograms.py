@@ -1,15 +1,16 @@
-
+def analog_read(channel):
+    r = spi.xfer2([1, (8 + channel) << 4, 0])
+    adc_out = ((r[1]&3) << 8) + r[2]
+    return adc_out
 
 def read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    with mcp3008.MCP3008() as adc:
-        data = (adc.read([V12_READ_INPUTLIST]))
+    data = analog_read(V12_READ_INPUTLIST)
     finaldata = (data / 1023) * (3.3 * MULTIPLIER_12V)
     return finaldata
 
 
 def read_hi(channellist, HIREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    with mcp3008.MCP3008() as adc:
-        data = (adc.read([channellist]))
+    data = analog_read(channellist)
     if data > HIREADLIMIT:
         finaldata = True
     else:
@@ -18,18 +19,16 @@ def read_hi(channellist, HIREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , 
 
 
 def read_low(channellist, LOWREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-   with mcp3008.MCP3008() as adc:
-        data = (adc.read([channellist]))
-        if data < LOWREADLIMIT:
-            finaldata = True
-        else:
-            finaldata = False
-        return finaldata
+    data = analog_read(channellist)
+    if data < LOWREADLIMIT:
+        finaldata = True
+    else:
+        finaldata = False
+    return finaldata
 
 def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     multiplier = 10
-    with mcp3008.MCP3008() as adc:
-        data = (adc.read([AMBIENT_LIGHT_LIST]))
+    data = analog_read(AMBIENT_LIGHT_LIST)
     resistance = (data / 1023) * (3.3 * multiplier)
     light_level = resistance #TODO check light level resistance curve to use!!!
     if light_level > NIGHTMODETHRESHOLD:
@@ -40,8 +39,7 @@ def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): #"/dev/spidev1.0
 
 def read_ambient_temperature(AMBIENT_TEMP_LIST): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     multiplier = 10
-    with mcp3008.MCP3008() as adc:
-        data = (adc.read(AMBIENT_TEMP_LIST))
+    data = analog_read(AMBIENT_TEMP_LIST)
     resistance = (data / 1023) * (3.3 * multiplier)
     temperature = resistance #TODO check ambient temperature probe resistance curve to use!!!
     return temperature
@@ -49,8 +47,7 @@ def read_ambient_temperature(AMBIENT_TEMP_LIST): #"/dev/spidev1.0" tai "/dev/spi
 
 def read_watertemperature(WATERTEMP_INPUT_LIST): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     multiplier =  10
-    with mcp3008.MCP3008() as adc:
-        data = (adc.read(WATERTEMP_INPUT_LIST))
+    data = analog_read(WATERTEMP_INPUT_LIST)
     resistance = (data / 1023) * (3.3 * multiplier)
     temperature = -30.57 * math.log(resistance) + 212.11 #function to get temperature from kawasaki stock water temperature sensor
     return temperature
@@ -58,8 +55,7 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): #"/dev/spidev1.0" tai "/dev/spi
 
 def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     multiplier = 10
-    with mcp3008.MCP3008() as adc:
-        data = (adc.read(RESERVEFUEL_INPUT_LIST))
+    data = analog_read(RESERVEFUEL_INPUT_LIST)
     resistance = (data / 1023) * (3.3 * multiplier)
     if resistance < 22: #activation value of reservefuel light 
         reservefuel = True

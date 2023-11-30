@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 import math
 from datetime import datetime
 import requests # For frontend data transfer
-import mcp3008
+import spidev
 
 CORRECTION = 1 #speedometer CORRECTION value, 1,0 is stock from factory
 GEAR_RATIO = [2.533, 2.053, 1.737, 1.524, 1.381, 1.304] # gears 1 to 6 ratios
@@ -54,7 +54,8 @@ scene = 1 #which scene is first to start on poweron
 tripcounter = 0.0
 qs_status = 1 # set qs status as activated on startup
 GPIO.setwarnings(False) # Sets any warnings off #TODO check if needed to fix
-
+spi = spidev.SpiDev()
+spi.open(0, 0)
 
 while True: 
     status = get_status(BLINKER_LEFT_LIST, BLINKER_RIGHT_LIST,HI_BEAM_LIST, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_LIST, OIL_LIGHT_LIST, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT)
