@@ -1,5 +1,8 @@
 import RPi.GPIO as GPIO
 import spidev
+import math
+import datetime 
+import time
 
 
 def analog_read(channel):

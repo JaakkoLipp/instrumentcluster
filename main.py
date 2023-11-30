@@ -56,7 +56,7 @@ qs_status = 1 # set qs status as activated on startup
 GPIO.setwarnings(False) # Sets any warnings off #TODO check if needed to fix
 
 while True: 
-    status = get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_LIST, OIL_LIGHT_LIST, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT)
+    status = get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT)
     scene = sceneshifter(status, scene, SCENEMAX)
     scenereturn = scenedrawer(scene, status, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_LIST)
     sceneout = scenereturn[0] #output string is 1. datapoint in list, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_LIST
