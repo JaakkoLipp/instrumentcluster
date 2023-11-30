@@ -74,7 +74,7 @@ def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): #"/dev/spidev1.0" tai "/dev/s
 
 
 def readstate(inputpin):
-    GPIO.setmode(GPIO.BCM)
+    GPIO.setmode(GPIO.BOARD)
     GPIO.setup(inputpin, GPIO.OUT)
     GPIO.output(inputpin, GPIO.LOW)
     state = GPIO.input(inputpin)
@@ -340,13 +340,13 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLI
     elif scene == 5: # scene for controlling quickshifter status
         if getstatus[8] == -1: # if left button long press detected
             if qs_status == 1: # if qs enabled, turn pin low to disable qs and set qs_status = 0
-                GPIO.setmode(GPIO.BCM)
+                GPIO.setmode(GPIO.BOARD)
                 GPIO.setup(QS_PIN, GPIO.OUT)
                 GPIO.output(QS_PIN, GPIO.LOW) # set gpio to low for relay to be in active state
                 GPIO.cleanup()
                 qs_status = 0  # set qs status to 0, disabled
             else:              # if qs diabled, turn pin high to activate qs and set qs_status = 1
-                GPIO.setmode(GPIO.BCM)
+                GPIO.setmode(GPIO.BOARD)
                 GPIO.setup(QS_PIN, GPIO.OUT)
                 GPIO.output(QS_PIN, GPIO.HIGH) # set gpio to high for relay to be in not active state
                 GPIO.cleanup()

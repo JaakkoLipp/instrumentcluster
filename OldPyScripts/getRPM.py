@@ -3,7 +3,7 @@ import time
 
 def getrpm(gpio_pin):
     # Set up GPIO
-    GPIO.setmode(GPIO.BCM)
+    GPIO.setmode(GPIO.BOARD)
     GPIO.setup(gpio_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     
     # Initialize variables
