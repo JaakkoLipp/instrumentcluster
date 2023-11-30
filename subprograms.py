@@ -58,7 +58,7 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): #"/dev/spidev1.0" tai "/dev/spi
     multiplier =  10
     data = analog_read(WATERTEMP_INPUT_LIST)
     resistance = (data / 1023) * (3.3 * multiplier)
-    temperature = -30.57 * math.log(resistance) + 212.11 #function to get temperature from kawasaki stock water temperature sensor
+    temperature = resistance # TODO remove !!-30.57 * math.log(resistance) + 212.11 #function to get temperature from kawasaki stock water temperature sensor
     return temperature
 
 
