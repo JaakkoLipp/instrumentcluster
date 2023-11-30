@@ -20,11 +20,11 @@ def read_hi(channellist, HIREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , 
 def read_low(channellist, LOWREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
    with mcp3008.MCP3008() as adc:
         data = (adc.read([channellist]))
-    if data < LOWREADLIMIT:
-        finaldata = True
-    else:
-        finaldata = False
-    return finaldata
+        if data < LOWREADLIMIT:
+            finaldata = True
+        else:
+            finaldata = False
+        return finaldata
 
 def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
     multiplier = 10
