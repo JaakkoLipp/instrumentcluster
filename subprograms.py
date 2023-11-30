@@ -184,7 +184,7 @@ def getrpm(RPM_PIN):
     
     
 
-def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION): #returns list containing [str:gear, int:speed km/h, int:rpm]
+def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_PIN, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION): #returns list containing [str:gear, int:speed km/h, int:rpm]
     
     speedlist = getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION)  #gets speed and speed signal frequency
     speed = speedlist[0]
@@ -192,7 +192,7 @@ def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIST, FRONT_SPROCKET_PULSES_PER_ROTA
 
     rpm = getrpm(RPM_PIN)   #gets rpm
 
-    if (read_low(NEUTRAL_LIST, LOWREADLIMIT) == True): #reads if neutral pin low or not. If low N is displayed.
+    if (readstate(NEUTRAL_LIGHT_PIN) == True): #reads if neutral pin low or not. If low N is displayed.
         return (["N", speed, rpm])
     else:
 
@@ -205,14 +205,14 @@ def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIST, FRONT_SPROCKET_PULSES_PER_ROTA
         return (["-", speed, rpm])
     
 
-def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
+def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_LIST, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
     blinker_left = readstate(BLINKER_LEFT_PIN)
     blinker_right = readstate(BLINKER_RIGHT_PIN)
     hi_beam = readstate(HI_BEAM_PIN)                                 #current button interface:
     left_button = read_hi(LEFT_BUTTON_LIST, HIREADLIMIT)                         #sceneshift = left button shortpress (sceneshift == -1)
     right_button = read_hi(RIGHT_BUTTON_LIST, HIREADLIMIT)                       #in scene reset or interact = left button longpress (longpress == -1)
     engine_light = readstate(ENGINE_LIGHT_PIN)
-    oil_light = readstate(OIL_LIGHT_PIN)
+    oil_light = read_hi(OIL_LIGHT_LIST)
 
     
 
