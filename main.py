@@ -46,7 +46,7 @@ RESERVEFUEL_INPUT_LIST = 7 # - reservefuel inputpin adc [channel 0-7], reserve f
 
 odo = odoread() #datatype kilometers
 trip = tripread() #datatype kilometers
-gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)
+gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)
 odotime = time.time()
 otherdata = otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST)
 scene = 1 #which scene is first to start on poweron
