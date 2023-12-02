@@ -3,7 +3,7 @@ import spidev
 import math
 import datetime 
 import time
-
+import requests # For frontend data transfer
 
 def analog_read(channel):
     spi = spidev.SpiDev()
@@ -392,10 +392,21 @@ def send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata)
     dt_string = time.strftime("%H:%M") #Time to display
     server_input_list = [gear_speed_rpm[0], gear_speed_rpm[1], gear_speed_rpm[2], status[0], status[1], status[2], status[5], status[6], sceneout, dt_string, otherdata[0], otherdata[1], otherdata[2]]
 
-    #TODO jaakko plox remov hastags
-    #data = {"GPIOLIST": server_input_list}
-    #response = requests.post("localhost:5000/gpiodata", json=data)
-    #print("Data sent!!", data)
+    #################################API########################################
+
+    try:
+        response = requests.post("http://localhost:5000/gpiodata", json=data)
+        # It's a good practice to check if the request was successful
+        if response.status_code == 200:
+            print("Data sent successfully!", data)
+        else:
+            print("Failed to send data. Status code:", response.status_code)
+
+    except requests.exceptions.RequestException as e:
+        # This will catch any exception raised by the requests library
+        print("Data sentn't: ", e)
+
+    #################################API########################################
 
     newtime = time.time() # new time for next distance calculation
     output = [distanceinkm, newtime] # output time for next loop and distance to add to the odo and trip.
