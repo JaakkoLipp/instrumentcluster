@@ -1,16 +1,20 @@
 import RPi.GPIO as GPIO
-import spidev
+import Adafruit_GPIO.SPI as SPI
+import Adafruit_MCP3008
 import math
 import datetime 
 import time
 import requests # For frontend data transfer
 
 def analog_read(channel):
-    spi = spidev.SpiDev()
-    spi.open(0, 0)
-    r = spi.xfer2([1, (8 + channel) << 4, 0])
-    adc_out = ((r[1]&3) << 8) + r[2]
-    spi.close()
+
+    #spi pins:#
+    CLK = 11   
+    MISO = 9
+    MOSI = 10
+    CS = 8
+    mcp = Adafruit_MCP3008.MCP3008(clk=CLK, cs=CS, miso=MISO, mosi=MOSI)
+    adc_out = mcp.read_adc(channel)
     return adc_out
 
 def read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
