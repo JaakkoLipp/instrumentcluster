@@ -228,19 +228,25 @@ def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST
                 left_buttonlongpress = read_hi(LEFT_BUTTON_LIST, HIREADLIMIT)                               
                 if left_buttonlongpress == left_button:
                     longpress = -1 #for long left press. outputs -1
+                    sceneshift = 0
                 else:
-                    sceneshift = -1 # for short left press to switch scene left            
+                    sceneshift = -1 # for short left press to switch scene left
+                    longpress = 0            
             else:
                 sceneshift = -1 # for short left press to switch scene left
+                longpress = 0
         else:
             sceneshift = -1 # for short left press to switch scene left
+            LONGPRESS = 0
 
     elif right_button == True:
         time.sleep(BUTTONSLEEP)
         if True == read_hi(RIGHT_BUTTON_LIST, HIREADLIMIT):
             longpress = 1 #for long right press. outputs 1
+            sceneshift = 0
         else: 
             sceneshift = 1 # for short right press to switch scene right
+            longpress = 0
             
     else:
         sceneshift = 0 # Sceneshift does not shift scene
