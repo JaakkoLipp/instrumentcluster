@@ -11,9 +11,9 @@ GEAR_RATIO = [2.533, 2.053, 1.737, 1.524, 1.381, 1.304] # gears 1 to 6 ratios
 GEAR_SENSITIVITY = 0.10 # How much variability allowed around calculated gear ratios
 SPEEDRATIO = 0.779221 # ratio between speed and frequency (how many kmh per hz) for example( 60kmh / 77hz = 0.779221 kmh/hz)
 FRONT_SPROCKET_PULSES_PER_ROTATION = 4 # How many pulses speedsensor sends each rotation of front sprocket
-MULTIPLIER_12V = 1 # Must be defined to run code correctly!!  #TODO check multiplier value
-HIREADLIMIT = 0.6 #adc output value which is minimum for activation of hiread, used for positive voltage input
-LOWREADLIMIT = 0.25 #adc output value which is maximum for activation of lowread, used for ground sensing input
+MULTIPLIER_12V = 5,17 # Must be defined to run code correctly!!  #TODO check multiplier value
+HIREADLIMIT = 0.5 #adc output value which is minimum for activation of hiread, used for positive voltage input
+LOWREADLIMIT = 0.25 #adc output value which is maximum for activation of lowread, used for ground sensing input TODO check 
 NIGHTMODETHRESHOLD= 30 #TODO #resistance for nightmode activation threshold
 BUTTONSLEEP = 0.8 #sleeptime to detect long press
 SCENEMAX = 4 #How many changing scenes is available by scene change button
