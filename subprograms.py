@@ -390,9 +390,12 @@ def send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata)
     distance = speedinms * deltatime # calculate distance covered in that time with current speed
     distanceinkm = distance / 1000.0
     dt_string = time.strftime("%H:%M") #Time to display
-    server_input_list = [gear_speed_rpm[0], gear_speed_rpm[1], gear_speed_rpm[2], status[0], status[1], status[2], status[5], status[6], sceneout, dt_string, otherdata[0], otherdata[1], otherdata[2]]
+    server_input_list = [gear_speed_rpm[0], gear_speed_rpm[1], gear_speed_rpm[2], status[0], 
+                         status[1], status[2], status[5], status[6], sceneout, dt_string, 
+                         otherdata[0], otherdata[1], otherdata[2]]
 
     #################################API########################################
+    data = {"GPIOLIST": server_input_list}
 
     try:
         response = requests.post("http://localhost:5000/gpiodata", json=data)
