@@ -18,7 +18,7 @@ NIGHTMODETHRESHOLD= 30 #TODO #resistance for nightmode activation threshold
 BUTTONSLEEP = 0.8 #sleeptime to detect long press
 SCENEMAX = 4 #How many changing scenes is available by scene change button
 
-# gpio pins:
+# gpio pins::
 
 SPEEDPIN = 29 #speedometer input gpio pin
 RPM_PIN= 31 #rpm input pin
