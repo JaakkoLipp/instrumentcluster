@@ -27,8 +27,8 @@ QS_PIN = 33 #gpio output pin for quicshifter controlling, currently 1 for activa
 BLINKER_LEFT_PIN = 11
 BLINKER_RIGHT_PIN = 13
 HI_BEAM_PIN = 15
-ENGINE_LIGHT_PIN = 16 
-OIL_LIGHT_PIN = 18
+ENGINE_LIGHT_PIN = 16
+NEUTRAL_LIGHT_PIN = 18 
 
 #TODO gpio input pins plox check correct
 
@@ -36,14 +36,12 @@ OIL_LIGHT_PIN = 18
 
 V12_READ_INPUTLIST = 0 # + 12v sensing inputpin adc [channel 0-7]
 WATERTEMP_INPUT_LIST = 1 # + watertemp inputpin adc [channel 0-7], watertemp multiplier by resistance, defined in subprogarams
-AMBIENT_LIGHT_LIST = 2 # + ambientlight resistor inputpin adc [channel 0-7], ambient light multiplier by resistance
-AMBIENT_TEMP_LIST = 3 # + ambient temperature resistor inputpin adc [channel 0-7], ambient temp multiplier by resistance
-LEFT_BUTTON_LIST = 4 # +
-RIGHT_BUTTON_LIST = 5 # + 
-NEUTRAL_LIGHT_LIST = 6 # -
-RESERVEFUEL_INPUT_LIST = 7 # - reservefuel inputpin adc [channel 0-7], reserve fuel state multiplier by resistance
-
-
+RESERVEFUEL_INPUT_LIST = 2 # - reservefuel inputpin adc [channel 0-7], reserve fuel state multiplier by resistance
+AMBIENT_LIGHT_LIST = 3 # + ambientlight resistor inputpin adc [channel 0-7], ambient light multiplier by resistance
+AMBIENT_TEMP_LIST = 4 # + ambient temperature resistor inputpin adc [channel 0-7], ambient temp multiplier by resistance
+LEFT_BUTTON_LIST = 5 # +
+RIGHT_BUTTON_LIST = 6 # + 
+OIL_LIGHT_LIST = 7 # +
 
 
 
@@ -79,7 +77,7 @@ while True:
 
     otherdata = otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST) #read otherdata [nightmode(1/0), reservefuelstate(1/0), watertemperature(str))
     
-    gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)  # update only gear, speed and rpm data to save process time
+    gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_PIN, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)  # update only gear, speed and rpm data to save process time
     ododata = send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) #output data as printing and returning and calculating trip distance 
     odotime = ododata[1]
     odo = odo + ododata[0]
