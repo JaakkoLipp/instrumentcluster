@@ -78,7 +78,9 @@ def readstate(inputpin):
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(inputpin, GPIO.OUT)
     GPIO.output(inputpin, GPIO.LOW)
+    GPIO.setup(inputpin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
     state = GPIO.input(inputpin)
+    GPIO.cleanup()
     if state == 1:
         return True
     else:
