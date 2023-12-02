@@ -5,7 +5,7 @@ import Adafruit_MCP3008
 CLK = 23
 MISO = 21
 MOSI = 19
-CS = 8
+CS = 24
 
 mcp = Adafruit_MCP3008.MCP3008(clk=CLK, cs=CS, miso=MISO, mosi=MOSI)
 print('Reading MCP3008 values, press Ctrl-C to quit...')
