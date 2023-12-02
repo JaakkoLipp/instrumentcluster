@@ -216,6 +216,8 @@ def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST
     right_button = read_hi(RIGHT_BUTTON_LIST, HIREADLIMIT)                       #in scene reset or interact = left button longpress (longpress == -1)
     engine_light = readstate(ENGINE_LIGHT_PIN)
     oil_light = readstate(OIL_LIGHT_PIN)
+    longpress = 0
+    sceneshift = 0
 
     
 
@@ -251,8 +253,6 @@ def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST
     else:
         sceneshift = 0 # Sceneshift does not shift scene
         longpress = 0 # No long press detected
-    if longpress == None:
-        longpress = 0
     return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light, sceneshift, longpress])
 
 def otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST): #Outputs list containing [nightmode 1/0, reservefuelstate 1/0, watertemperature string]
