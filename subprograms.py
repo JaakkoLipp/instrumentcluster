@@ -198,11 +198,14 @@ def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PE
 
         front_sprocket_speed = (speed_frequency / FRONT_SPROCKET_PULSES_PER_ROTATION) * 60 # Change revolutions per second to rpm 
         clutch_rpm = rpm / 1.611 # clutch / crank reduction ratio
-        ratio = clutch_rpm / front_sprocket_speed
-        for i in range(6):
-            if (abs(ratio-GEAR_RATIO[i]) < GEAR_SENSITIVITY):
-                return ([str(i + 1), speed, rpm])
-        return (["-", speed, rpm])
+        if front_sprocket_speed == 0:
+            return (["-", speed, rpm])
+        else:
+            ratio = clutch_rpm / front_sprocket_speed
+            for i in range(6):
+                if (abs(ratio-GEAR_RATIO[i]) < GEAR_SENSITIVITY):
+                    return ([str(i + 1), speed, rpm])
+            return (["-", speed, rpm])
     
 
 def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
