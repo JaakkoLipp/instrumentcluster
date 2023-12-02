@@ -141,7 +141,7 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
             prev_time = time.time()
     
     except KeyboardInterrupt:
-        pass
+        return [0,0]
     
     
 
