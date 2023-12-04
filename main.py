@@ -5,6 +5,9 @@ import math
 from datetime import datetime
 import requests # For frontend data transfer
 import spidev
+from w1thermsensor import W1ThermSensor
+
+# Global values for code::
 
 CORRECTION = 1 #speedometer CORRECTION value, 1,0 is stock from factory
 GEAR_RATIO = [2.533, 2.053, 1.737, 1.524, 1.381, 1.304] # gears 1 to 6 ratios
@@ -20,29 +23,35 @@ SCENEMAX = 4 #How many changing scenes is available by scene change button
 
 # gpio pins::
 
-SPEEDPIN = 29 #speedometer input gpio pin
-RPM_PIN= 31 #rpm input pin
-QS_PIN = 33 #gpio output pin for quicshifter controlling, currently 1 for activated and 0 for disabled
+SPEEDPIN = 0 #speedometer input gpio pin
+RPM_PIN = 2 #rpm input pin
+BLINKER_LEFT_PIN = 23
+BLINKER_RIGHT_PIN = 22
+HI_BEAM_PIN = 3
+ENGINE_LIGHT_PIN = 25
+OIL_LIGHT_PIN = 24
+AMBIENT_TEMP_PIN = 4 # 1 wire ambient temperature sensor, DS18B20, does not affect code, just for note  
 
-BLINKER_LEFT_PIN = 11
-BLINKER_RIGHT_PIN = 13
-HI_BEAM_PIN = 15
-ENGINE_LIGHT_PIN = 16
-OIL_LIGHT_PIN = 18 
 
-#TODO gpio input pins plox check correct
+#mcp3008 pins from 0-7::
 
-#mcp3008 pins from 0-7
-
-V12_READ_INPUTLIST = 0 # + 12v sensing inputpin adc [channel 0-7]
-WATERTEMP_INPUT_LIST = 1 # + watertemp inputpin adc [channel 0-7], watertemp multiplier by resistance, defined in subprogarams
-AMBIENT_LIGHT_LIST = 2 # + ambientlight resistor inputpin adc [channel 0-7], ambient light multiplier by resistance
-AMBIENT_TEMP_LIST = 3 # + ambient temperature resistor inputpin adc [channel 0-7], ambient temp multiplier by resistance
-LEFT_BUTTON_LIST = 4 # +
-RIGHT_BUTTON_LIST = 5 # + 
+V12_READ_INPUTLIST = 4 # + 12v sensing inputpin adc [channel 0-7]
+WATERTEMP_INPUT_LIST = 5 # + watertemp inputpin adc [channel 0-7], watertemp multiplier by resistance, defined in subprogarams
+AMBIENT_LIGHT_LIST = 2 # + ambientlight resistor inputpin adc [channel 0-7], purple thin wire
+LEFT_BUTTON_LIST = 1 # +
+RIGHT_BUTTON_LIST = 0 # + 
 NEUTRAL_LIGHT_LIST = 6 # +
 RESERVEFUEL_INPUT_LIST = 7 # - reservefuel inputpin adc [channel 0-7], reserve fuel state multiplier by resistance
 
+
+# Currently not in use::
+
+QS_PIN = 29 #gpio output pin for quicshifter controlling, currently 1 for activated and 0 for disabled
+XX_PIN = 7 # 1.st photocoupler, not connected currently
+XX_LIST = 3  # + Free to use ADC pin, positive 12v [channel 0-7]
+
+
+#############  Main code  ##############
 
 odo = odoread() #datatype kilometers
 trip = tripread() #datatype kilometers
@@ -57,8 +66,8 @@ GPIO.setwarnings(False) # Sets any warnings off #TODO check if needed to fix
 while True: 
     status = get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT)
     scene = sceneshifter(status, scene, SCENEMAX)
-    scenereturn = scenedrawer(scene, status, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_LIST)
-    sceneout = scenereturn[0] #output string is 1. datapoint in list, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_LIST
+    scenereturn = scenedrawer(scene, status, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_PIN)
+    sceneout = scenereturn[0] #output string is 1. datapoint in list, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_PIN
     if scene == 2:
         trip = scenereturn[1] #if reset button have been used, scenereturn 2. datapoint is new trip(0.0)
     elif scene == 5:

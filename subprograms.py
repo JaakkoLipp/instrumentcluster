@@ -5,6 +5,8 @@ import math
 import datetime 
 import time
 import requests # For frontend data transfer
+from w1thermsensor import W1ThermSensor
+import os
 
 def analog_read(channel):
 
@@ -51,11 +53,10 @@ def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): #"/dev/spidev1.0
         finaldata = False
     return finaldata
 
-def read_ambient_temperature(AMBIENT_TEMP_LIST): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    multiplier = 10
-    data = analog_read(AMBIENT_TEMP_LIST)
-    resistance = (data / 1023) * (3.3 * multiplier)
-    temperature = resistance #TODO check ambient temperature probe resistance curve to use!!!
+def read_ambient_temperature(AMBIENT_TEMP_PIN): # pin which sensor is connected, BCM
+    sensor = W1ThermSensor()
+    data = sensor.get_temperature()
+    temperature = round(data, 1)
     return temperature
 
 
@@ -330,7 +331,7 @@ def sceneshifter(getstatus, scene, SCENEMAX):
         return scene # returns scene which is active without button input
 
 
-def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_LIST): #subprogram outputs string which should be displayed in changing slot as list, item0 is string and item1 changes to values
+def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_PIN): #subprogram outputs string which should be displayed in changing slot as list, item0 is string and item1 changes to values
 	#TODO when using scenedrawer, must check for list to reset odo
 	# scenecounter starting from 2 to make odometer default display if error occures
 
@@ -343,7 +344,7 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLI
         return triplist	
     
     elif scene == 3: # scene outside air temperature display
-        ambient_temp = read_ambient_temperature(AMBIENT_TEMP_LIST) # readambient from adc	
+        ambient_temp = read_ambient_temperature(AMBIENT_TEMP_PIN) # readambient from adc	
         ambientround = round(ambient_temp, 1)     # rounding ambient temp to 1 decimal
         ambientstring = str(ambientround) + " c°" # converting ambient temp to string and add unit 
         return [ambientstring]
