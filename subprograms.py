@@ -43,11 +43,9 @@ def read_low(channellist, LOWREADLIMIT): #"/dev/spidev1.0" tai "/dev/spidev1.1" 
     return finaldata
 
 def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): #"/dev/spidev1.0" tai "/dev/spidev1.1" , channel 0-7
-    multiplier = 10
     data = analog_read(AMBIENT_LIGHT_LIST)
-    resistance = (data / 1023) * (3.3 * multiplier)
-    light_level = resistance #TODO check light level resistance curve to use!!!
-    if light_level > NIGHTMODETHRESHOLD:
+    
+    if data > NIGHTMODETHRESHOLD:
         finaldata = True
     else:
         finaldata = False
