@@ -66,9 +66,10 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
 
 
 def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7)
-    Threshold = 1000 # Activation value of fuel light 
+    Threshold = 0.206 # Activation value of fuel light 
     data = analog_read(RESERVEFUEL_INPUT_LIST)
-    if data < Threshold: 
+	voltage = (1023 / data) * 3.3
+    if voltage < Threshold: 
         reservefuel = True
     else:
         reservefuel = False
