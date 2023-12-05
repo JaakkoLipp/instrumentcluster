@@ -61,7 +61,7 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     multiplier =  10 # This value multiplies the temperature 
     data = analog_read(WATERTEMP_INPUT_LIST)
     resistance = (data / 1023) * (3.3 * multiplier)
-    temperature = resistance # TODO remove !!-30.57 * math.log(resistance) + 212.11 # Function to get temperature from kawasaki anti linear stock water temperature sensor
+    temperature = resistance -30.57 * math.log(resistance) + 212.11 # Function to get temperature from kawasaki anti linear stock water temperature sensor
     return temperature
 
 
