@@ -37,11 +37,11 @@ AMBIENT_TEMP_PIN = 4                                    # 1 wire ambient tempera
 
 RIGHT_BUTTON_LIST = 0                                   # ADC input pin for right button 12v [channel 0-7]
 LEFT_BUTTON_LIST = 1                                    # ADC input pin for left button 12v [channel 0-7]
-AMBIENT_LIGHT_LIST = 2                                  # ADC input pin for ambiet light photoresistor, purple wire 12v [channel 0-7]
+AMBIENT_LIGHT_LIST = 2                                  # ADC input pin for ambiet light photoresistor, purple wire, resistor connects to 12v [channel 0-7]
 V12_READ_INPUTLIST = 4                                  # ADC input pin for +12V [channel 0-7]
-WATERTEMP_INPUT_LIST = 5                                # ADC input pin for water temperature sensor, connects to ground [channel 0-7]
-NEUTRAL_LIGHT_LIST = 6                                  # ADC input pin for neutral light sensor, connects to ground [channel 0-7]
-RESERVEFUEL_INPUT_LIST = 7                              # ADC input pin for fuel light sensor 12v [channel 0-7]
+WATERTEMP_INPUT_LIST = 5                                # ADC input pin for water temperature sensor, connects to ground through swnsor [channel 0-7]
+NEUTRAL_LIGHT_LIST = 6                                  # ADC input pin for neutral light sensor, connects to ground through switch [channel 0-7]
+RESERVEFUEL_INPUT_LIST = 7                              # ADC input pin for fuel light sensor, connects to ground through sensor [channel 0-7]
 
 
 # Currently not in use::
