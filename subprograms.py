@@ -144,7 +144,7 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
             
             prev_time = time.time()
     
-    except KeyBCMInterrupt:
+    except Exception:
         return [0,0]
     
     
