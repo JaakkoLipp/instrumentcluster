@@ -51,6 +51,7 @@ def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): # ADC channel nu
     return finaldata
 
 def read_ambient_temperature(AMBIENT_TEMP_PIN): # Pin which sensor is connected, BCM
+    return 1023#TODO
     sensor = W1ThermSensor()
     data = sensor.get_temperature()
     temperature = round(data, 1)
