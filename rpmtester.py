@@ -6,7 +6,7 @@ from time import sleep
 def getrpm(RPM_PIN):
     # Set up GPIO
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     # Initialize variables
     falling_edges = 0
