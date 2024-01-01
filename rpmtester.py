@@ -19,7 +19,7 @@ def getrpm(RPM_PIN):
         for x in range(num_samples):
             print("waiting for first edge")
             # Wait for the first falling edge
-            if GPIO.wait_for_edge(RPM_PIN, GPIO.FALLING, timeout=6000) is None:  # If timeout occures, returns rpm 0. Times out if rpm is lower than 500
+            if GPIO.wait_for_edge(RPM_PIN, GPIO.RISING, timeout=6000) is None:  # If timeout occures, returns rpm 0. Times out if rpm is lower than 500
                 rpm = 0
                 GPIO.cleanup()
                 print("timeout and exit")
