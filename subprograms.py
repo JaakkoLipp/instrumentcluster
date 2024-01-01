@@ -58,27 +58,22 @@ def read_ambient_temperature():
 
 
 def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
-    multiplier =  10 # This value multiplies the temperature 
     data = analog_read(WATERTEMP_INPUT_LIST)
 
     vout = (data / 1023) * 3.3
     resistance = 330 * (vout / (3.3 - vout))
 
-    # Function to get temperature from kawasaki anti linear stock water temperature sensor
-    # Known temperature-resistance pairs
-    temp_resistance_pairs = [
-        (50.0, 210),
-        (80.0, 69.1),
-        (120.0, 21.2)
-    ]
+    A = 823.1987862528065
+    B = -6.832658624383815e-05
+    C = -14.711156089438125
 
-    # Linear interpolation
-    for i in range(len(temp_resistance_pairs) - 1):
-        (temp1, res1), (temp2, res2) = temp_resistance_pairs[i], temp_resistance_pairs[i + 1]
-        if res1 >= resistance >= res2 or res2 >= resistance >= res1:
-            slope = (temp2 - temp1) / (res2 - res1)
-            temperature = temp1 + slope * (resistance - res1)
-            return temperature
+    # Function to get temperature from kawasaki anti linear stock water temperature sensor
+    # Calculate temperature using the Steinhart-Hart equation
+    temperature_kelvin = 1 / (A + B * math.log(resistance) + C * (math.log(resistance))**3)
+    # Convert temperature to Celsius
+    temperature_celsius = temperature_kelvin - 273.15
+    return temperature_celsius
+
 
 
 
