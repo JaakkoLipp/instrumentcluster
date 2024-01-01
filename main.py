@@ -57,7 +57,7 @@ trip = tripread() # Datatype kilometers
 gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)
 odotime = time.time()
 otherdata = otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST)
-scene = 1 # Defines first scene to start on poweron
+scene = 3 # Defines first scene to start on poweron #TODO
 tripcounter = 0.0
 qs_status = 1 # Sets qs status as activated on startup
 GPIO.setwarnings(False) # Sets any Gpio warnings off
