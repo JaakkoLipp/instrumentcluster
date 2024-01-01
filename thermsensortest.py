@@ -9,4 +9,4 @@ def read_ambient_temperature(): # Pin which sensor is connected, BCM
 
 while True:
     print(read_ambient_temperature())
-    sleep(1)
+    
