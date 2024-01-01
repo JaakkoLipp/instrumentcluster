@@ -38,7 +38,7 @@ def getrpm(RPM_PIN):
                 
                 
                 # Exit after a specified number of samples
-                if falling_edges >= num_samples:
+                if falling_edges >= num_samples-1:
                     print("all pulses gotten")
                     final_frequency = sum(frequencies) / len(frequencies)
                     rpm = final_frequency * 30  # Converting frequency to rpm (6000rpm = 200hz and 30rpm = 1hz)
