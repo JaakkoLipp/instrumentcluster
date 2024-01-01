@@ -65,16 +65,26 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     resistance = 330 * (vout / (3.3 - vout))
 
     # Function to get temperature from kawasaki anti linear stock water temperature sensor
-    # Hardcoded coefficients calculated using linear interpolation
-    A = 4.08704775446144e-04
-    B = 2.54708060687974e-04
-    C = 9.80911436438120e-08
-    
-    ln_R = math.log(resistance)
-    
-    # Steinhart-Hart equation
-    temperature = 1 / (A + B * ln_R + C * (ln_R ** 3)) - 273.15
-    
+    # Hardcoded data points
+    resistance_points = [210, 69.1, 21.2]  # Resistance values
+    temperature_points = [50, 80, 120]  # Corresponding temperature values
+
+    # Linear interpolation
+    if resistance <= resistance_points[1]:
+        # Linear interpolation between the first two points
+        temperature = ((temperature_points[1] - temperature_points[0]) / 
+                       (resistance_points[1] - resistance_points[0]) * 
+                       (resistance - resistance_points[0]) + temperature_points[0])
+    elif resistance <= resistance_points[2]:
+        # Linear interpolation between the last two points
+        temperature = ((temperature_points[2] - temperature_points[1]) / 
+                       (resistance_points[2] - resistance_points[1]) * 
+                       (resistance - resistance_points[1]) + temperature_points[1])
+    else:
+        # Extrapolation (outside the given resistance range)
+        # You may handle this case differently based on your requirements
+        temperature = temperature_points[2]
+
     return temperature
 
 
