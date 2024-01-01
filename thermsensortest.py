@@ -1,5 +1,5 @@
 from w1thermsensor import W1ThermSensor
-import sleep
+from time import sleep
 
 def read_ambient_temperature(): # Pin which sensor is connected, BCM
     sensor = W1ThermSensor()
