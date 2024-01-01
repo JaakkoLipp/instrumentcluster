@@ -41,5 +41,5 @@ def getrpm(RPM_PIN):
     return rpm
 
 while True:
-    print(getrpm())
+    print(getrpm(2))
     sleep(1)
