@@ -60,9 +60,34 @@ def read_ambient_temperature():
 def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     multiplier =  10 # This value multiplies the temperature 
     data = analog_read(WATERTEMP_INPUT_LIST)
-    resistance = (data / 1023) * (3.3 * multiplier)
-    temperature = resistance -30.57 * math.log(resistance) + 212.11 # Function to get temperature from kawasaki anti linear stock water temperature sensor
+
+    vout = (data / 1023) * 3.3
+    resistance = 330 * (vout / (3.3 - vout))
+
+    # Function to get temperature from kawasaki anti linear stock water temperature sensor
+    # Known data points
+    resistance_points = [210, 69.1, 21.2]
+    temperature_points = [50, 80, 120]
+
+    # Linear interpolation formula: y = mx + b
+    m1 = (temperature_points[1] - temperature_points[0]) / (resistance_points[1] - resistance_points[0])
+    b1 = temperature_points[0] - m1 * resistance_points[0]
+
+    m2 = (temperature_points[2] - temperature_points[1]) / (resistance_points[2] - resistance_points[1])
+    b2 = temperature_points[1] - m2 * resistance_points[1]
+
+    # Interpolate temperature for the given resistance
+    if resistance <= resistance_points[0]:
+        temperature = m1 * resistance + b1
+    elif resistance <= resistance_points[1]:
+        temperature = m1 * resistance + b1
+    elif resistance <= resistance_points[2]:
+        temperature = m2 * resistance + b2
+    else:
+        temperature = m2 * resistance + b2
+
     return temperature
+
 
 
 def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7)
@@ -152,18 +177,19 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
 def getrpm(RPM_PIN):
     # Set up GPIO
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     # Initialize variables
     falling_edges = 0
     prev_time = None
     frequencies = []
-    num_samples = 2
+    num_samples = 5
 
     try:
         for x in range(num_samples):
             # Wait for the first falling edge
-            if GPIO.wait_for_edge(RPM_PIN, GPIO.FALLING, timeout=60) is None:  # If timeout occures, returns rpm 0. Times out if rpm is lower than 500
+            edgeDetected = GPIO.wait_for_edge(RPM_PIN, GPIO.RISING, timeout=60)
+            if edgeDetected == None:  # If timeout occures, returns rpm 0. Times out if rpm is lower than 500
                 rpm = 0
                 GPIO.cleanup()
                 return rpm 
@@ -173,12 +199,13 @@ def getrpm(RPM_PIN):
                 current_time = time.time()
                 time_difference = current_time - prev_time
                 frequency = 1.0 / time_difference  # Calculate frequency
-                frequencies.append(frequency)
+                if frequency < 500:
+                    frequencies.append(frequency)
                 falling_edges += 1
                 
                 
                 # Exit after a specified number of samples
-                if falling_edges >= num_samples:
+                if falling_edges >= num_samples-1:
                     final_frequency = sum(frequencies) / len(frequencies)
                     rpm = final_frequency * 30  # Converting frequency to rpm (6000rpm = 200hz and 30rpm = 1hz)
             prev_time = time.time()
