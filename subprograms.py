@@ -50,7 +50,7 @@ def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): # ADC channel nu
         finaldata = False
     return finaldata
 
-def read_ambient_temperature(AMBIENT_TEMP_PIN): # Pin which sensor is connected, BCM
+def read_ambient_temperature():
     sensor = W1ThermSensor()
     data = sensor.get_temperature()
     temperature = round(data, 1)
@@ -343,9 +343,8 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLI
         return triplist	
     
     elif scene == 3: # Ambient temperature scene
-        ambient_temp = read_ambient_temperature(AMBIENT_TEMP_PIN) # Reads ambient temperature from adc	
-        ambientround = round(ambient_temp, 1)                     # rounding ambient temp to 1 decimal
-        ambientstring = str(ambientround) + " c°"                 # converting ambient temp to string and adding unit 
+        ambient_temp = read_ambient_temperature() # Reads ambient temperature from adc	
+        ambientstring = str(ambient_temp) + " c°"                 # converting ambient temp to string and adding unit 
         return [ambientstring]
     
     elif scene == 4: # Battery voltage scene
