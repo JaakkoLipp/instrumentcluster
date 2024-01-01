@@ -12,7 +12,7 @@ def getrpm(RPM_PIN):
     falling_edges = 0
     prev_time = None
     frequencies = []
-    num_samples = 2
+    num_samples = 4
     print("initialized")
 
     try:
@@ -34,6 +34,7 @@ def getrpm(RPM_PIN):
                 frequency = 1.0 / time_difference  # Calculate frequency
                 frequencies.append(frequency)
                 falling_edges += 1
+                print(frequencies, falling_edges)
                 
                 
                 # Exit after a specified number of samples
