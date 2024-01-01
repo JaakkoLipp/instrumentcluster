@@ -62,6 +62,7 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
 
     vout = (data / 1023) * 3.3
     resistance = 330 * (vout / (3.3 - vout))
+    print(resistance)
 
     A = 823.1987862528065
     B = -6.832658624383815e-05
