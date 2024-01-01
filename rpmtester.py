@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 import time
+from time import sleep
 
 
 def getrpm(RPM_PIN):
