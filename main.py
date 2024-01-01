@@ -24,7 +24,7 @@ SCENEMAX = 4                                            # How many changing scen
 # Gpio pins in BCM::
 
 SPEEDPIN = 0                                            # Speedometer input pin
-RPM_PIN = 2                                             # Rpm input pin
+RPM_PIN = 27                                            # Rpm input pin
 BLINKER_LEFT_PIN = 23                                   # Left blinker input pin
 BLINKER_RIGHT_PIN = 22                                  # Right blinker input pin
 HI_BEAM_PIN = 3                                         # High beam input pin
