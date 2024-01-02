@@ -91,9 +91,7 @@ def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7)
 
 def readstate(inputpin): # Reads state of gpio pin and returns True or False
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(inputpin, GPIO.OUT)
-    GPIO.output(inputpin, GPIO.LOW)
-    GPIO.setup(inputpin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+    GPIO.setup(inputpin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     state = GPIO.input(inputpin)
     GPIO.cleanup()
     if state == 1:
