@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
-import math
+import math as mt
 import datetime 
 import time
 import requests # For frontend data transfer
@@ -63,16 +63,17 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     resistance = 330 / (1023/ data - 1)
     print(resistance)
 
-    A = 823.1987862528065
-    B = -6.832658624383815e-05
-    C = -14.711156089438125
+    A = 1.775685151e-3
+    B = 2.537279638e-4
+    C = -2.461770337e-7
 
     # Function to get temperature from kawasaki anti linear stock water temperature sensor
-    # Calculate temperature using the Steinhart-Hart equation
-    temperature_kelvin = 1 / (A + B * math.log(resistance) + C * (math.log(resistance))**3)
-    # Convert temperature to Celsius
-    temperature_celsius = temperature_kelvin - 273.15
-    return temperature_celsius
+    # Steinhart - Hart Equation
+    TempK = 1 / (A + (B * mt.log(resistance)) + C * mt.pow(mt.log(resistance),3))
+    # Convert from Kelvin to Celsius
+    TempC = TempK - 273.15
+
+    return TempC
 
 
 
