@@ -60,7 +60,9 @@ def read_ambient_temperature():
 def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     data = analog_read(WATERTEMP_INPUT_LIST)
 
-    resistance = 330 / (1023/ data - 1)
+    resistance = 330 / (1023/ data - 1) # Remove zero from resistance to run code without devided by zero issue
+    if resistance == 0:
+        resistance = 1
 
     # Function to get temperature from kawasaki thermistor
 
