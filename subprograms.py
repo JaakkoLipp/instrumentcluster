@@ -61,13 +61,13 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     data = analog_read(WATERTEMP_INPUT_LIST)
 
     resistance = 330 / (1023/ data - 1)
-    print(resistance)
+
+    # Function to get temperature from kawasaki thermistor
 
     A = 1.775685151e-3
     B = 2.537279638e-4
     C = -2.461770337e-7
 
-    # Function to get temperature from kawasaki anti linear stock water temperature sensor
     # Steinhart - Hart Equation
     TempK = 1 / (A + (B * mt.log(resistance)) + C * mt.pow(mt.log(resistance),3))
     # Convert from Kelvin to Celsius
@@ -280,7 +280,7 @@ def otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, 
 	nightmode = read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD)           # Reads ambient light status, True or False
 	reservefuelstate = read_reservefuelstate(RESERVEFUEL_INPUT_LIST)                 # Reads reservefuel state, True or False
 	watertempint = read_watertemperature(WATERTEMP_INPUT_LIST)                       # Reads watertemperature
-	watertemprounded = round(watertempint, 1)                                        # Rounds watertemperature to full number
+	watertemprounded = round(watertempint, 0)                                        # Rounds watertemperature to full number
 	watertempstr = str(watertemprounded) + " c°"                                     # Makes watertemperature string and adds unit
 	outputlist = [nightmode, reservefuelstate, watertempstr]                         # Makes output list
 	return outputlist
