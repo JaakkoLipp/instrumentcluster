@@ -23,14 +23,14 @@ SCENEMAX = 4                                            # How many changing scen
 
 # Gpio pins in BCM::
 
-SPEEDPIN = 0                                            # Speedometer input pin
+SPEEDPIN = 17                                            # Speedometer input pin
 RPM_PIN = 27                                            # Rpm input pin
-BLINKER_LEFT_PIN = 23                                   # Left blinker input pin
-BLINKER_RIGHT_PIN = 22                                  # Right blinker input pin
-HI_BEAM_PIN = 3                                         # High beam input pin
-ENGINE_LIGHT_PIN = 25                                   # Fi or engine light input pin
-OIL_LIGHT_PIN = 24                                      # Oil pressure light input pin
-AMBIENT_TEMP_PIN = 4                                    # 1 wire ambient temperature sensor, DS18B20, does not affect code, just for connection note  
+BLINKER_LEFT_PIN = 13                                   # Left blinker input pin
+BLINKER_RIGHT_PIN = 6                                   # Right blinker input pin
+HI_BEAM_PIN = 22                                        # High beam input pin
+ENGINE_LIGHT_PIN = 26                                   # Fi or engine light input pin
+OIL_LIGHT_PIN = 19                                      # Oil pressure light input pin
+AMBIENT_TEMP_PIN = 24                                   # 1 wire ambient temperature sensor, DS18B20, does not affect code, just for connection note  
 
 
 #Mcp3008 pins from 0-7::
