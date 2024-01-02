@@ -94,7 +94,7 @@ def readstate(inputpin): # Reads state of gpio pin and returns True or False
     GPIO.setup(inputpin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     state = GPIO.input(inputpin)
     GPIO.cleanup()
-    if state == 1:
+    if state == 0:
         return True
     else:
         return False
