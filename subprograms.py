@@ -60,8 +60,8 @@ def read_ambient_temperature():
 def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     data = analog_read(WATERTEMP_INPUT_LIST)
 
-    if data == 0: # Add 1 to data to run code without devided by zero issue
-        data = 1
+    if data == 0: # Add 2 to data to run code without devided by zero issue
+        data = 2
 
     resistance = 330 / (1023/ data - 1) 
    
