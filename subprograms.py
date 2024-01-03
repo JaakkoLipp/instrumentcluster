@@ -106,7 +106,7 @@ def readstate(inputpin): # Reads state of gpio pin and returns True or False
 def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     # Set up GPIO
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     # Initialize variables
     falling_edges = 0
@@ -114,7 +114,6 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     frequencies = []
     num_samples = 1
     sampler = 0
-    loop_stop = False
 
     if CORRECTION == None:
         CORRECTION = 1.0
@@ -131,7 +130,8 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
             if prev_time is not None:
                 time_difference = time.time() - prev_time
                 frequency = 1.0 / time_difference  # Calculate frequency
-                frequencies.append(frequency)
+                if frequency < 400:
+                    frequencies.append(frequency)
                 falling_edges += 1
                 if sampler == 0:   # Going to run only once to determinate sample size
                     if frequency <=4: # At low speeds using smaller sample size for shorter sampling times
@@ -147,13 +147,11 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
                 sampler = 1     # Rising sampler variable not to run sampler loop again
                 
                 # Exit after a specified number of samples
-                if falling_edges >= num_samples:
-                    print("calculating speed in getspeed")
+                if falling_edges >= num_samples -1:
                     final_frequency = sum(frequencies) / len(frequencies)
                     speed = final_frequency * SPEEDRATIO  # Converting frequency to kmh using speed ratio
                     corrected_speed = speed * CORRECTION  # Correcting speed for known measuring error
                     GPIO.cleanup()
-                    print("gpio cleanup in getspeed")
                     return [corrected_speed, final_frequency]
             
             prev_time = time.time()
