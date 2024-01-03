@@ -7,8 +7,8 @@ GPIO.setmode(GPIO.BCM)
 # Set the GPIO pin number you want to use
 gpio_pin = 17  # Change this to your actual GPIO pin number
 
-# Setup the GPIO pin as an input
-GPIO.setup(gpio_pin, GPIO.IN)
+# Setup the GPIO pin as an input with pull-down resistor enabled
+GPIO.setup(gpio_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 try:
     while True:
