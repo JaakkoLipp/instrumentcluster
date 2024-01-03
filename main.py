@@ -18,7 +18,7 @@ MULTIPLIER_12V = 5.17                                   # Value to calculate vol
 HIREADLIMIT = 500                                       # Adc output value which is minimum for activation of hiread, used for positive voltage input (+)
 LOWREADLIMIT = 500                                      # Adc output value which is maximum for activation of lowread, used for ground sensing input (-)
 NIGHTMODETHRESHOLD= 1000                                # ADC data for nightmode activation threshold (0-1023)
-BUTTONSLEEP = 0.8                                       # Time in seconds to detect long press
+BUTTONSLEEP = 2                                         # Time in seconds to detect long press
 SCENEMAX = 4                                            # How many changing scenes is available by scene change button
 
 # Gpio pins in BCM::
@@ -46,7 +46,7 @@ WATERTEMP_INPUT_LIST = 7                                # ADC input pin for wate
 # Currently not in use::
 
 QS_PIN = 29                                             # Gpio output pin for quickshifter controlling, 1 for activated and 0 for disabled
-XX_PIN = 7                                              # 1.st channel in level converter, currently not connected
+XX_PIN = 4                                              # 1.st channel in level converter, currently not connected
 XX_LIST = 3                                             # Free ADC pin, positive 12v [channel 0-7]
 
 
@@ -57,7 +57,7 @@ trip = tripread() # Datatype kilometers
 gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)
 odotime = time.time()
 otherdata = otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST)
-scene = 3 # Defines first scene to start on poweron #TODO
+scene = 4 # Defines first scene to start on poweron
 tripcounter = 0.0
 qs_status = 1 # Sets qs status as activated on startup
 GPIO.setwarnings(False) # Sets any Gpio warnings off
