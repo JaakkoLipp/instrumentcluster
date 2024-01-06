@@ -79,11 +79,11 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
 
 
 
-def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7) :TODO
+def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7) #TODO elias
     Threshold = 0.206 # Activation value of fuel light 
     data = analog_read(RESERVEFUEL_INPUT_LIST)
     voltage = (1023 / data) * 3.3
-    if voltage < Threshold:
+    if voltage < Threshold: 
         reservefuel = True
     else:
         reservefuel = False
@@ -97,7 +97,18 @@ def readstate(inputpin):
         return state == 0
     except Exception as e:
         print(f"Error reading GPIO pin {inputpin}: {e}")
-        return False
+        return False\
+        
+def pin_changed_callback(channel):
+    data = GPIO.input(channel)
+    if data:
+        output = True 
+    else:
+        output = False
+
+    #TODO jaakko aplly datasend here
+    # channels are 3, 6 and 13, which are 
+    # left blinker, right blinker and high beam
     
 
 def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
@@ -148,7 +159,7 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     except Exception as e:
         print(f"Error in getspeed: {e}")
     
-    GPIO.cleanup()
+    
     return [0, 0]
     
 
@@ -212,10 +223,7 @@ def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PE
     return ["-", speed, rpm]
     
 
-def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
-    blinker_left = readstate(BLINKER_LEFT_PIN)
-    blinker_right = readstate(BLINKER_RIGHT_PIN)
-    hi_beam = readstate(HI_BEAM_PIN)                                             # Current button interface:
+def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.                                             # Current button interface:
     left_button = read_hi(LEFT_BUTTON_LIST, HIREADLIMIT)                         # Sceneshift = left button shortpress (sceneshift == -1)
     right_button = read_hi(RIGHT_BUTTON_LIST, HIREADLIMIT)                       # If scene resetted or interacted = left button longpress (longpress == -1)
     engine_light = readstate(ENGINE_LIGHT_PIN)
@@ -257,7 +265,7 @@ def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST
     else:
         sceneshift = 0 # Sceneshift does not shift scene
         longpress = 0  # No long press detected
-    return ([blinker_left, blinker_right, hi_beam, left_button, right_button, engine_light, oil_light, sceneshift, longpress])
+    return ([left_button, right_button, engine_light, oil_light, sceneshift, longpress])
 
 def otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST): # Outputs list containing [nightmode 1/0, reservefuelstate 1/0, watertemperature string]
 	nightmode = read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD)           # Reads ambient light status, True or False
@@ -374,9 +382,9 @@ def send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata)
     distance = speedinms * deltatime    # Calculate distance covered in that time with current speed
     distanceinkm = distance / 1000.0
     dt_string = time.strftime("%H:%M")  # Time to display
-    server_input_list = [gear_speed_rpm[0], gear_speed_rpm[1], gear_speed_rpm[2], status[0], 
-                         status[1], status[2], status[5], status[6], sceneout, dt_string, 
+    server_input_list = [gear_speed_rpm[0], gear_speed_rpm[1], status[2], status[3], sceneout, dt_string, 
                          otherdata[0], otherdata[1], otherdata[2]]
+    #geardata str, speedata int, engine_light bool, oil_light bool, scene str, clock time str, nightmode bool, reservefuelstate bool, watertempstr
 
     #################################API########################################
     data = {"GPIOLIST": server_input_list}
@@ -403,5 +411,4 @@ def send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata)
 def shutdownwrite(odo, trip):
     odowrite(odo)
     tripwrite(trip)
-    GPIO.cleanup()
     return

@@ -5,6 +5,7 @@ import math
 from datetime import datetime
 import requests # For frontend data transfer
 import spidev
+import subprocess
 
 
 # Global values for code::
@@ -53,15 +54,23 @@ XX_LIST = 3                                             # Free ADC pin, positive
 #############  Main code  ##############
 
 GPIO.setmode(GPIO.BCM)
+
+# Add an event detection for the pin (both rising and falling edges)
+GPIO.add_event_detect(BLINKER_LEFT_PIN, GPIO.BOTH, callback=pin_changed_callback(BLINKER_LEFT_PIN))
+GPIO.add_event_detect(BLINKER_RIGHT_PIN, GPIO.BOTH, callback=pin_changed_callback(BLINKER_RIGHT_PIN))
+GPIO.add_event_detect(BLINKER_RIGHT_PIN, GPIO.BOTH, callback=pin_changed_callback(HI_BEAM_PIN))
+
 odo = odoread()   # Datatype kilometers
 trip = tripread() # Datatype kilometers
 gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)
 odotime = time.time()
 otherdata = otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST)
-scene = 4 # Defines first scene to start on poweron
+scene = 1 # Defines first scene to start on poweron
 tripcounter = 0.0
 qs_status = 1 # Sets qs status as activated on startup
 GPIO.setwarnings(False) # Sets any Gpio warnings off
+subprocess.Popen(['python3', 'rpmreader.py'])
+
 
 while True: 
     status = get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT)
@@ -86,16 +95,15 @@ while True:
     otherdata = otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST) # Reads otherdata [nightmode(1/0), reservefuelstate(1/0), watertemperature(str))
     
     gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)  # Updates only gear, speed and rpm data to save process time
-    ododata = send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) # Outputs data as sending it to local server with requests and returns and calculates trip distance 
+    ododata = send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) # Outputs data as sending it to local server with requests and returns and calculates trip distance
     odotime = ododata[1]
     odo = odo + ododata[0]
     trip = trip + ododata[0]
 
     if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) < 8.0: # Checks if power input is below voltagelimit of 8v. If true, shuts instrumentcluster down.
         time.sleep(1)
-        if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) <8.0: # Checks again if voltage is low to commit shutdown
+        if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) <8.0: # Checks again if voltage is under 8 volts
             shutdownwrite(odo, trip)    # Commands needed to run before shutdown, saves odo and trip
             time.sleep(1)
             os.system("shutdown now -h") # Shuts down the system.
-    else:
-        time.sleep(0.01) # Short sleep to limit While loop speed
+    
