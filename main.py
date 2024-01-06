@@ -52,6 +52,7 @@ XX_LIST = 3                                             # Free ADC pin, positive
 
 #############  Main code  ##############
 
+GPIO.setmode(GPIO.BCM)
 odo = odoread()   # Datatype kilometers
 trip = tripread() # Datatype kilometers
 gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)

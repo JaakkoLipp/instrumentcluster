@@ -51,10 +51,8 @@ def read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD): # ADC channel nu
     return finaldata
 
 def read_ambient_temperature():
-    sensor = W1ThermSensor()
-    data = sensor.get_temperature()
-    temperature = round(data, 1)
-    return temperature
+    return round(W1ThermSensor().get_temperature(), 1)
+
 
 
 def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
@@ -81,7 +79,7 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
 
 
 
-def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7)
+def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7) :TODO
     Threshold = 0.206 # Activation value of fuel light 
     data = analog_read(RESERVEFUEL_INPUT_LIST)
     voltage = (1023 / data) * 3.3
@@ -92,20 +90,18 @@ def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7)
     return reservefuel
 
 
-def readstate(inputpin): # Reads state of gpio pin and returns True or False
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(inputpin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    state = GPIO.input(inputpin)
-    GPIO.cleanup()
-    if state == 0:
-        return True
-    else:
+def readstate(inputpin):
+    try:
+        GPIO.setup(inputpin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        state = GPIO.input(inputpin)
+        return state == 0
+    except Exception as e:
+        print(f"Error reading GPIO pin {inputpin}: {e}")
         return False
     
 
 def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
-    # Set up GPIO
-    GPIO.setmode(GPIO.BCM)
+
     GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     # Initialize variables
@@ -114,56 +110,50 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     frequencies = []
     num_samples = 1
     sampler = 0
-
-    if CORRECTION == None:
+    
+    if CORRECTION is None:
         CORRECTION = 1.0
+
     try:
         while True:
-
-            # Waits for the first falling edge
-
-            if GPIO.wait_for_edge(SPEEDPIN, GPIO.FALLING, timeout=260) is None:  # If timeout occures, returns speed 0
-                print("exited before getspeed loop")
-                GPIO.cleanup()
-                return [0, 0]
-            # Measure time between falling edges
+            if GPIO.wait_for_edge(SPEEDPIN, GPIO.FALLING, timeout=260) is None:
+                print("Exited before getspeed loop")
+                break
+            
             if prev_time is not None:
                 time_difference = time.time() - prev_time
-                frequency = 1.0 / time_difference  # Calculate frequency
-                if frequency < 400:
-                    frequencies.append(frequency)
-                falling_edges += 1
-                if sampler == 0:   # Going to run only once to determinate sample size
-                    if frequency <=4: # At low speeds using smaller sample size for shorter sampling times
-                        num_samples = 1
-                    elif frequency > 4 and frequency < 8:
-                        num_samples = 1
-                    elif frequency >= 8 and frequency < 15:
-                        num_samples = 2
-                    elif frequency >= 15 and frequency < 40:
-                        num_samples = 2
-                    else:
-                        num_samples = 3
-                sampler = 1     # Rising sampler variable not to run sampler loop again
+                frequency = 1.0 / time_difference
                 
-                # Exit after a specified number of samples
-                if falling_edges >= num_samples -1:
-                    final_frequency = sum(frequencies) / len(frequencies)
-                    speed = final_frequency * SPEEDRATIO  # Converting frequency to kmh using speed ratio
-                    corrected_speed = speed * CORRECTION  # Correcting speed for known measuring error
-                    GPIO.cleanup()
-                    return [corrected_speed, final_frequency]
+                if 4 <= frequency < 8:
+                    num_samples = 1
+                elif 8 <= frequency < 40:
+                    num_samples = 2
+                elif frequency >= 40:
+                    num_samples = 3
+                
+                if sampler == 0:
+                    sampler = 1
+                    # Exit after a specified number of samples
+                    if falling_edges >= num_samples - 1:
+                        final_frequency = sum(frequencies) / len(frequencies)
+                        speed = final_frequency * SPEEDRATIO
+                        corrected_speed = round(speed * CORRECTION ,0)
+                        return [corrected_speed, final_frequency]
+                
+                falling_edges += 1
+                frequencies.append(frequency)
             
             prev_time = time.time()
     
-    except Exception:
-        return [0,0]
+    except Exception as e:
+        print(f"Error in getspeed: {e}")
     
+    GPIO.cleanup()
+    return [0, 0]
     
 
 def getrpm(RPM_PIN):
-    # Set up GPIO
-    GPIO.setmode(GPIO.BCM)
+
     GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     # Initialize variables
@@ -177,9 +167,7 @@ def getrpm(RPM_PIN):
             # Wait for the first falling edge
             edgeDetected = GPIO.wait_for_edge(RPM_PIN, GPIO.RISING, timeout=60)
             if edgeDetected == None:  # If timeout occures, returns rpm 0. Times out if rpm is lower than 500
-                rpm = 0
-                GPIO.cleanup()
-                return rpm 
+                return 0 
             
             # Measure time between falling edges
             if prev_time is not None:
@@ -193,39 +181,35 @@ def getrpm(RPM_PIN):
                 
                 # Exit after a specified number of samples
                 if falling_edges >= num_samples-1:
-                    final_frequency = sum(frequencies) / len(frequencies)
-                    rpm = final_frequency * 30  # Converting frequency to rpm (6000rpm = 200hz and 30rpm = 1hz)
+                    rpm = (sum(frequencies) / len(frequencies)) * 30  # Converting frequency to rpm (6000rpm = 200hz and 30rpm = 1hz)
             prev_time = time.time()
     except Exception: 
         pass
-    GPIO.cleanup()
     return rpm
     
     
 
-def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION): 
+def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION):
     # Returns list containing [str:gear, int:speed km/h, int:rpm]
 
-    speedlist = getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION)  # Gets speed and speed signal frequency
-    speed = speedlist[0]
-    speed_frequency = speedlist[1]
-
+    speed, speed_frequency = getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION)  # Gets speed and speed signal frequency
     rpm = getrpm(RPM_PIN)   # Gets rpm
 
-    if (read_low(NEUTRAL_LIGHT_LIST, LOWREADLIMIT) == True): # Reads if neutral pin is low or not. If pin is low, N is returned
-        return (["N", speed, rpm])
-    else:
+    if read_low(NEUTRAL_LIGHT_LIST, LOWREADLIMIT):
+        return ["N", speed, rpm]
 
-        front_sprocket_speed = (speed_frequency / FRONT_SPROCKET_PULSES_PER_ROTATION) * 60 # Change revolutions per second to rpm 
-        clutch_rpm = rpm / 1.611 # Clutch / crank reduction ratio
-        if front_sprocket_speed == 0:
-            return (["-", speed, rpm])
-        else:
-            ratio = clutch_rpm / front_sprocket_speed
-            for i in range(6):
-                if (abs(ratio-GEAR_RATIO[i]) < GEAR_SENSITIVITY):
-                    return ([str(i + 1), speed, rpm])
-            return (["-", speed, rpm])
+    front_sprocket_speed = (speed_frequency / FRONT_SPROCKET_PULSES_PER_ROTATION) * 60  # Convert revolutions per second to rpm
+    clutch_rpm = rpm / 1.611  # Clutch / crank reduction ratio
+
+    if front_sprocket_speed == 0:
+        return ["-", speed, rpm]
+
+    ratio = clutch_rpm / front_sprocket_speed
+    for i in range(6):
+        if abs(ratio - GEAR_RATIO[i]) < GEAR_SENSITIVITY:
+            return [str(i + 1), speed, rpm]
+
+    return ["-", speed, rpm]
     
 
 def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.
@@ -287,49 +271,33 @@ def otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, 
 
 def odoread():
     with open("odo.txt", "r") as file:
-        odoread = file.read()
-        file.close()
-        floatodoread = float(odoread)
-        return floatodoread
+        return float(file.read())
 
 def tripread():
     with open("trip.txt", "r") as file:
-        tripread = file.read()
-        file.close()
-        floattripread = float(tripread)
-        return floattripread
+        return float(file.read())
 
 
 def odowrite(odo):
-    try: # Try to open "odo.txt" for writing
-        stringodo = str(odo)
+    stringodo = str(odo)
+    try:
         with open("odo.txt", "w") as file:
             file.write(stringodo)
-            file.close()
-        return
 
     except FileNotFoundError:
-        stringodo = str(odo)
-        with open("backup.txt", "w") as file:   # If the file doesn't exist, creates "backup.txt" and saves "odo" there
-            file.write(stringodo)               
-            file.close()
-        return
-        
+        # If "odo.txt" doesn't exist, creates "backup.txt" and saves "odo" there
+        with open("backup.txt", "w") as file:
+            file.write(stringodo)
 
     except Exception as e:
         print(f"An error occurred with odowrite: {e}")
-        return
 
 def tripwrite(trip):
-    try: # Try to open "trip.txt" for writing
-        stringtrip = str(trip)
+    try:
         with open("trip.txt", "w") as file:
-            file.write(stringtrip)
-            file.close()
-        return
+            file.write(str(trip))
     except Exception as e:
         print(f"An error occurred with tripwrite: {e}")
-        return
 
 def sceneshifter(getstatus, scene, SCENEMAX):
     if getstatus[7] == -1:
@@ -370,18 +338,14 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLI
     elif scene == 5: # Quickshifter controlling scene
         if getstatus[8] == -1: # If left button long press detected
             if qs_status == 1: # If qs enabled, turn pin low to disable qs and set qs_status = 0
-                GPIO.setmode(GPIO.BCM
-        )
+        
                 GPIO.setup(QS_PIN, GPIO.OUT)
                 GPIO.output(QS_PIN, GPIO.LOW) # Set gpio to low for relay to be in active state
-                GPIO.cleanup()
                 qs_status = 0  # Set qs status to 0, disabled
             else:              # If qs diabled, turn pin high to activate qs and set qs_status = 1
-                GPIO.setmode(GPIO.BCM
-        )
+        
                 GPIO.setup(QS_PIN, GPIO.OUT)
                 GPIO.output(QS_PIN, GPIO.HIGH) # Set gpio to high for relay to be in not active state
-                GPIO.cleanup()
                 qs_status = 1 # Set qs status to 1, activated
         
         if qs_status == 1:
@@ -437,6 +401,7 @@ def send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata)
 	
 
 def shutdownwrite(odo, trip):
-	odowrite(odo)
-	tripwrite(trip)
-	return
+    odowrite(odo)
+    tripwrite(trip)
+    GPIO.cleanup()
+    return
