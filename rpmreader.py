@@ -43,7 +43,7 @@ def getrpm(RPM_PIN):
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False) # Sets any Gpio warnings off
-RPM_PIN = 27 
+RPM_PIN = 23 
 
 while True:
   rpm = round(getrpm(RPM_PIN), 0)
