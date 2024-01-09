@@ -405,4 +405,5 @@ def send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata)
 def shutdownwrite(odo, trip):
     odowrite(odo)
     tripwrite(trip)
+    GPIO.cleanup()
     return
