@@ -58,8 +58,8 @@ def read_ambient_temperature():
 def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     data = analog_read(WATERTEMP_INPUT_LIST)
 
-    if data < 2: # Add 2 to data to run code without devided by zero issue
-        data = 2
+    if data < 5: # if ADC value under 5, thermistor is not connected properly
+        return("N/A")
 
     resistance = 330 / (1023/ data - 1) 
    
@@ -92,7 +92,6 @@ def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7) #T
 
 def readstate(inputpin):
     try:
-        GPIO.setup(inputpin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         state = GPIO.input(inputpin)
         return state == 0
     except Exception as e:
@@ -112,8 +111,6 @@ def pin_changed_callback(channel):
     
 
 def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
-
-    GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     # Initialize variables
     falling_edges = 0
@@ -164,8 +161,6 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     
 
 def getrpm(RPM_PIN):
-
-    GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     # Initialize variables
     falling_edges = 0
@@ -223,7 +218,7 @@ def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PE
     return ["-", speed, rpm]
     
 
-def get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.                                             # Current button interface:
+def get_status(LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.                                             # Current button interface:
     left_button = read_hi(LEFT_BUTTON_LIST, HIREADLIMIT)                         # Sceneshift = left button shortpress (sceneshift == -1)
     right_button = read_hi(RIGHT_BUTTON_LIST, HIREADLIMIT)                       # If scene resetted or interacted = left button longpress (longpress == -1)
     engine_light = readstate(ENGINE_LIGHT_PIN)
@@ -308,7 +303,7 @@ def tripwrite(trip):
         print(f"An error occurred with tripwrite: {e}")
 
 def sceneshifter(getstatus, scene, SCENEMAX):
-    if getstatus[7] == -1:
+    if getstatus[4] == -1:
         if scene < SCENEMAX and scene >= 1:
             scene = scene + 1
             return scene # Returns scene which is active after button input
@@ -319,7 +314,7 @@ def sceneshifter(getstatus, scene, SCENEMAX):
         return scene     # Returns scene which is active without button input
 
 
-def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_PIN):
+def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V):
 
     # Subprogram outputs string which should be displayed in free area of instrument cluster as list, item0 is string and item1 changes to values
     # Scenecounter starting from scene 2 to make odometer default display if error occures
@@ -327,7 +322,7 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLI
     if scene == 2: # Trip meter scene
         roundtrip = round(trip, 1)          # Rounding trip to 1 decimal in km
         tripstring = str(roundtrip) + " km" # Converting trip to string and add km unit
-        if getstatus[8] == -1:
+        if getstatus[5] == 1:
             trip = 0.0                      # If trip reset pressed, set trip to 0
         triplist = [tripstring, trip]       # Returns list including value and changes.
         return triplist	
@@ -344,15 +339,14 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLI
         return [voltagestring]
     
     elif scene == 5: # Quickshifter controlling scene
-        if getstatus[8] == -1: # If left button long press detected
+        if getstatus[5] == 1: # If left button long press detected
+            GPIO.setup(QS_PIN, GPIO.OUT)
             if qs_status == 1: # If qs enabled, turn pin low to disable qs and set qs_status = 0
         
-                GPIO.setup(QS_PIN, GPIO.OUT)
                 GPIO.output(QS_PIN, GPIO.LOW) # Set gpio to low for relay to be in active state
                 qs_status = 0  # Set qs status to 0, disabled
             else:              # If qs diabled, turn pin high to activate qs and set qs_status = 1
         
-                GPIO.setup(QS_PIN, GPIO.OUT)
                 GPIO.output(QS_PIN, GPIO.HIGH) # Set gpio to high for relay to be in not active state
                 qs_status = 1 # Set qs status to 1, activated
         

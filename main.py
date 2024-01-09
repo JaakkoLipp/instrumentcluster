@@ -36,13 +36,15 @@ AMBIENT_TEMP_PIN = 24                                   # 1 wire ambient tempera
 
 #Mcp3008 pins from 0-7::
 
-RIGHT_BUTTON_LIST = 0                                   # ADC input pin for right button 12v [channel 0-7]
-LEFT_BUTTON_LIST = 1                                    # ADC input pin for left button 12v [channel 0-7]
+LEFT_BUTTON_LIST = 0                                    # ADC input pin for right button 12v [channel 0-7]
+RIGHT_BUTTON_LIST = 1                                   # ADC input pin for left button 12v [channel 0-7]
 AMBIENT_LIGHT_LIST = 2                                  # ADC input pin for ambiet light photoresistor, purple wire, resistor connects to 12v [channel 0-7]
 V12_READ_INPUTLIST = 4                                  # ADC input pin for +12V [channel 0-7]
 RESERVEFUEL_INPUT_LIST = 5                              # ADC input pin for fuel light sensor, connects to ground through sensor [channel 0-7]
 NEUTRAL_LIGHT_LIST = 6                                  # ADC input pin for neutral light sensor, connects to ground through switch [channel 0-7]
 WATERTEMP_INPUT_LIST = 7                                # ADC input pin for water temperature sensor, connects to ground through swnsor [channel 0-7]
+
+#SPI pins can be found in subprograms.py, analog_read()
 
 # Currently not in use::
 
@@ -53,7 +55,12 @@ XX_LIST = 3                                             # Free ADC pin, positive
 
 #############  Main code  ##############
 
+# Setting gpio mode
 GPIO.setmode(GPIO.BCM)
+GPIO_INPUT_LIST = [SPEEDPIN, RPM_PIN, BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN, HI_BEAM_PIN, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, XX_PIN]
+for pin in GPIO_INPUT_LIST:
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
 
 # Add an event detection for the pin (both rising and falling edges)
 GPIO.add_event_detect(BLINKER_LEFT_PIN, GPIO.BOTH, callback=pin_changed_callback(BLINKER_LEFT_PIN))
@@ -73,10 +80,10 @@ subprocess.Popen(['python3', 'rpmreader.py'])
 
 
 while True: 
-    status = get_status(BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN,HI_BEAM_PIN, LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT, LOWREADLIMIT)
+    status = get_status(LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT)
     scene = sceneshifter(status, scene, SCENEMAX)
-    scenereturn = scenedrawer(scene, status, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_PIN)
-    sceneout = scenereturn[0] # Output string is 1. datapoint in list, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V, AMBIENT_TEMP_PIN
+    scenereturn = scenedrawer(scene, status, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V)
+    sceneout = scenereturn[0] # Output string is 1. datapoint in list, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V
     if scene == 2:
         trip = scenereturn[1] # If reset button have been used, scenereturn 2. datapoint is new trip(0.0)
     elif scene == 5:
