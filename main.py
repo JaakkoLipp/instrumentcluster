@@ -82,6 +82,7 @@ while True:
     elif scene == 5:
         qs_status = scenereturn[1]
     
+    gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)  # Updates only gear, speed and rpm data to save process time
     ododata = send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) #output data as printing and returning and calculating trip distance
     odotime = ododata[1]       # 2.nd item of odotime list is time of last measure
     odo = odo + ododata[0]     # 1.st item of odotime list is distance between last two displayed speed 
