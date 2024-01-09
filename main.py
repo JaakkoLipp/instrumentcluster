@@ -32,7 +32,7 @@ HI_BEAM_PIN = 22                                        # High beam input pin
 ENGINE_LIGHT_PIN = 26                                   # Fi or engine light input pin
 OIL_LIGHT_PIN = 19                                      # Oil pressure light input pin
 AMBIENT_TEMP_PIN = 24                                   # 1 wire ambient temperature sensor, DS18B20, does not affect code, just for connection note  
-
+#RPM_PIN for rpmreader.py is pin 23                     # Pin can be changed in rpmreader. Same data should be provided to both rpm pins
 
 #Mcp3008 pins from 0-7::
 

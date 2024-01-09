@@ -5,8 +5,6 @@ import requests
 
 
 def getrpm(RPM_PIN):
-
-    GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     # Initialize variables
     falling_edges = 0
@@ -41,9 +39,11 @@ def getrpm(RPM_PIN):
 
 ###############  Code  ###############
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False) # Sets any Gpio warnings off
 RPM_PIN = 23 
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setwarnings(False) # Sets any Gpio warnings off
+
 
 while True:
   rpm = round(getrpm(RPM_PIN), 0)
