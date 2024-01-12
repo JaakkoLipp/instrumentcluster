@@ -61,6 +61,15 @@ GPIO_INPUT_LIST = [SPEEDPIN, RPM_PIN, BLINKER_LEFT_PIN, BLINKER_RIGHT_PIN, HI_BE
 for pin in GPIO_INPUT_LIST:
     GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
+GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(BLINKER_LEFT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(BLINKER_RIGHT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(HI_BEAM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(ENGINE_LIGHT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(OIL_LIGHT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(XX_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
 
 # Add an event detection for the pin (both rising and falling edges)
 GPIO.add_event_detect(BLINKER_LEFT_PIN, GPIO.BOTH, callback=lambda x: pin_changed_callback(BLINKER_LEFT_PIN))
