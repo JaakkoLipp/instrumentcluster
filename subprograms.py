@@ -191,6 +191,8 @@ def getrpm(RPM_PIN):
             prev_time = time.time()
     except Exception: 
         pass
+    if rpm < 450 or rpm > 15000:
+        rpm = 0
     return rpm
     
     
