@@ -6,4 +6,4 @@
 sleep 2
 
 # Run main.py
-/usr/bin/python3 /home/pi/instrumentcluster/main.py
+screen -dmS main /usr/bin/python3 /home/pi/instrumentcluster/main.py
