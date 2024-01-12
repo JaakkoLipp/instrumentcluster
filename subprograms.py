@@ -167,6 +167,7 @@ def getrpm(RPM_PIN):
     prev_time = None
     frequencies = []
     num_samples = 5
+    rpm = 0
 
     try:
         for x in range(num_samples):
@@ -191,8 +192,6 @@ def getrpm(RPM_PIN):
             prev_time = time.time()
     except Exception: 
         pass
-    if rpm == None:
-        rpm = 0
     return rpm
     
     
