@@ -1,4 +1,4 @@
-  GNU nano 7.2                                        run_on_startup.sh *                                               #!/bin/bash
+#!/bin/bash
 
 # Run startAPI.sh
 /home/pi/startAPI.sh
