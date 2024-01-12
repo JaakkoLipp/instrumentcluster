@@ -63,9 +63,10 @@ for pin in GPIO_INPUT_LIST:
 
 
 # Add an event detection for the pin (both rising and falling edges)
-GPIO.add_event_detect(BLINKER_LEFT_PIN, GPIO.BOTH, callback=pin_changed_callback(BLINKER_LEFT_PIN))
-GPIO.add_event_detect(BLINKER_RIGHT_PIN, GPIO.BOTH, callback=pin_changed_callback(BLINKER_RIGHT_PIN))
-GPIO.add_event_detect(BLINKER_RIGHT_PIN, GPIO.BOTH, callback=pin_changed_callback(HI_BEAM_PIN))
+GPIO.add_event_detect(BLINKER_LEFT_PIN, GPIO.BOTH, callback=lambda x: pin_changed_callback(BLINKER_LEFT_PIN))
+GPIO.add_event_detect(BLINKER_RIGHT_PIN, GPIO.BOTH, callback=lambda x: pin_changed_callback(BLINKER_RIGHT_PIN))
+GPIO.add_event_detect(HI_BEAM_PIN, GPIO.BOTH, callback=lambda x: pin_changed_callback(HI_BEAM_PIN))
+
 
 odo = odoread()   # Datatype kilometers
 trip = tripread() # Datatype kilometers
