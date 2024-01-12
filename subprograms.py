@@ -58,7 +58,7 @@ def read_ambient_temperature():
 def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     data = analog_read(WATERTEMP_INPUT_LIST)
 
-    if data < 5: # if ADC value under 5, thermistor is not connected properly
+    if data < 5 or data > 1022 or data == 0: # if ADC value under 5, thermistor is not connected properly
         return("N/A")
 
     resistance = 330 / (1023/ data - 1) 
