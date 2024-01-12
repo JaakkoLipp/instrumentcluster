@@ -92,6 +92,7 @@ def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7) #T
 
 def readstate(inputpin):
     try:
+        GPIO.setup(inputpin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         state = GPIO.input(inputpin)
         return state == 0
     except Exception as e:
@@ -104,7 +105,7 @@ def pin_changed_callback(channel):
         output = True 
     else:
         output = False
-
+    print(output)
     #TODO jaakko aplly datasend here
     # channels are 3, 6 and 13, which are 
     # left blinker, right blinker and high beam
@@ -118,6 +119,8 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     frequencies = []
     num_samples = 1
     sampler = 0
+
+    GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     if CORRECTION is None:
         CORRECTION = 1.0
@@ -168,6 +171,8 @@ def getrpm(RPM_PIN):
     frequencies = []
     num_samples = 5
     rpm = 0
+
+    GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     try:
         for x in range(num_samples):
