@@ -114,7 +114,7 @@ try:
             if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) <8.0: # Checks again if voltage is under 8 volts
                 shutdownwrite(odo, trip)    # Commands needed to run before shutdown, saves odo and trip
                 time.sleep(1)
-                os.system("shutdown now -h") # Shuts down the system.
+                os.system("sudo shutdown now -h") # Shuts down the system.
     
 except KeyboardInterrupt:
     # Cleanup GPIO on Ctrl+C
