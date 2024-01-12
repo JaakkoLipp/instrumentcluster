@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run startAPI.sh
-/home/pi/instrumentcluster/startAPI.sh
+/home/pi/startAPI.sh
 
 sleep 2
 
