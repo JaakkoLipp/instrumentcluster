@@ -5,6 +5,8 @@ import requests
 
 
 def getrpm(RPM_PIN):
+
+    GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     # Initialize variables
     falling_edges = 0
