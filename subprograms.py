@@ -263,13 +263,13 @@ def get_status(LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_
     return ([left_button, right_button, engine_light, oil_light, sceneshift, longpress])
 
 def otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST): # Outputs list containing [nightmode 1/0, reservefuelstate 1/0, watertemperature string]
-	nightmode = read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD)           # Reads ambient light status, True or False
-	reservefuelstate = read_reservefuelstate(RESERVEFUEL_INPUT_LIST)                 # Reads reservefuel state, True or False
-	watertempint = read_watertemperature(WATERTEMP_INPUT_LIST)                       # Reads watertemperature
-	watertemprounded = round(watertempint, 0)                                        # Rounds watertemperature to full number
-	watertempstr = str(watertemprounded) + " c°"                                     # Makes watertemperature string and adds unit
-	outputlist = [nightmode, reservefuelstate, watertempstr]                         # Makes output list
-	return outputlist
+    nightmode = read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD)           # Reads ambient light status, True or False
+    reservefuelstate = read_reservefuelstate(RESERVEFUEL_INPUT_LIST)                 # Reads reservefuel state, True or False
+    watertempint = read_watertemperature(WATERTEMP_INPUT_LIST)                       # Reads watertemperature
+    watertemprounded = round(watertempint, 0)                                        # Rounds watertemperature to full number
+    watertempstr = str(watertemprounded) + " c°"                                     # Makes watertemperature string and adds unit
+    outputlist = [nightmode, reservefuelstate, watertempstr]                         # Makes output list
+    return outputlist
 	
 
 def odoread():
