@@ -58,7 +58,7 @@ def read_ambient_temperature():
 def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     data = analog_read(WATERTEMP_INPUT_LIST)
 
-    if data < 5: # if ADC value under 5, thermistor is not connected properly
+    if data < 5 or data > 1022 or data == 0: # if ADC value under 5, thermistor is not connected properly
         return("N/A")
 
     resistance = 330 / (1023/ data - 1) 
@@ -72,7 +72,7 @@ def read_watertemperature(WATERTEMP_INPUT_LIST): # ADC channel number (0-7)
     # Steinhart - Hart Equation
     TempK = 1 / (A + (B * mt.log(resistance)) + C * mt.pow(mt.log(resistance),3))
     # Convert from Kelvin to Celsius
-    TempC = TempK - 273.15
+    TempC = round(TempK - 273.15 ,0)
 
     return TempC
 
@@ -92,6 +92,7 @@ def read_reservefuelstate(RESERVEFUEL_INPUT_LIST): # ADC channel number (0-7) #T
 
 def readstate(inputpin):
     try:
+        GPIO.setup(inputpin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         state = GPIO.input(inputpin)
         return state == 0
     except Exception as e:
@@ -104,7 +105,7 @@ def pin_changed_callback(channel):
         output = True 
     else:
         output = False
-
+    print(output)
     #TODO jaakko aplly datasend here
     # channels are 3, 6 and 13, which are 
     # left blinker, right blinker and high beam
@@ -118,6 +119,8 @@ def getspeed(SPEEDPIN, SPEEDRATIO, CORRECTION):
     frequencies = []
     num_samples = 1
     sampler = 0
+
+    GPIO.setup(SPEEDPIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     
     if CORRECTION is None:
         CORRECTION = 1.0
@@ -167,6 +170,9 @@ def getrpm(RPM_PIN):
     prev_time = None
     frequencies = []
     num_samples = 5
+    rpm = 0
+
+    GPIO.setup(RPM_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     try:
         for x in range(num_samples):
@@ -219,8 +225,8 @@ def get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PE
     
 
 def get_status(LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT):  # status output 9 segment list: [blinker left, blinker right, hi beam, left button, right button, engine light, oil light, sceneshift, longpress]. when on, state is 1, when off state is 0 except in sceneshift where output can be -1, 0 or 1.                                             # Current button interface:
-    left_button = read_hi(LEFT_BUTTON_LIST, HIREADLIMIT)                         # Sceneshift = left button shortpress (sceneshift == -1)
-    right_button = read_hi(RIGHT_BUTTON_LIST, HIREADLIMIT)                       # If scene resetted or interacted = left button longpress (longpress == -1)
+    left_button = read_hi(LEFT_BUTTON_LIST, HIREADLIMIT)                         # Sceneshift = left button shortpress (sceneshift == 1, next scene) left button longpress (sceneshift == -1, previous scene)
+    right_button = read_hi(RIGHT_BUTTON_LIST, HIREADLIMIT)                       # If scene resetted or interacted = right button longpress (longpress == 1)
     engine_light = readstate(ENGINE_LIGHT_PIN)
     oil_light = readstate(OIL_LIGHT_PIN)
     longpress = 0
@@ -236,17 +242,17 @@ def get_status(LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_
                 time.sleep(BUTTONSLEEP / 3)                                                   
                 left_buttonlongpress = read_hi(LEFT_BUTTON_LIST, HIREADLIMIT)                               
                 if left_buttonlongpress == left_button:
-                    longpress = -1   # For long left press. outputs -1
-                    sceneshift = 0
+                    longpress = 0   # For long left press. outputs -1
+                    sceneshift = -1
                 else:
-                    sceneshift = -1  # For short left press to switch scene left
+                    sceneshift = 1  # For short left press to switch scene left
                     longpress = 0            
             else:
-                sceneshift = -1      # For short left press to switch scene left
+                sceneshift = 1      # For short left press to switch scene left
                 longpress = 0
         else:
-            sceneshift = -1          # For short left press to switch scene left
-            LONGPRESS = 0
+            sceneshift = 1          # For short left press to switch scene left
+            longpress = 0
 
     elif right_button == True:
         time.sleep(BUTTONSLEEP)
@@ -254,7 +260,7 @@ def get_status(LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_
             longpress = 1            # For long right press. outputs 1
             sceneshift = 0
         else: 
-            sceneshift = 1           # For short right press to switch scene right
+            sceneshift = 0           # For short right press to switch scene right
             longpress = 0
             
     else:
@@ -263,13 +269,13 @@ def get_status(LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_
     return ([left_button, right_button, engine_light, oil_light, sceneshift, longpress])
 
 def otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST): # Outputs list containing [nightmode 1/0, reservefuelstate 1/0, watertemperature string]
-    nightmode = read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD)           # Reads ambient light status, True or False
-    reservefuelstate = read_reservefuelstate(RESERVEFUEL_INPUT_LIST)                 # Reads reservefuel state, True or False
-    watertempint = read_watertemperature(WATERTEMP_INPUT_LIST)                       # Reads watertemperature
-    watertemprounded = round(watertempint, 0)                                        # Rounds watertemperature to full number
-    watertempstr = str(watertemprounded) + " c°"                                     # Makes watertemperature string and adds unit
-    outputlist = [nightmode, reservefuelstate, watertempstr]                         # Makes output list
-    return outputlist
+	nightmode = read_ambient_light(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD)           # Reads ambient light status, True or False
+	reservefuelstate = read_reservefuelstate(RESERVEFUEL_INPUT_LIST)                 # Reads reservefuel state, True or False
+	watertempint = read_watertemperature(WATERTEMP_INPUT_LIST)                       # Reads watertemperature
+	watertemprounded = round(watertempint, 0)                                        # Rounds watertemperature to full number
+	watertempstr = str(watertemprounded) + " c°"                                     # Makes watertemperature string and adds unit
+	outputlist = [nightmode, reservefuelstate, watertempstr]                         # Makes output list
+	return outputlist
 	
 
 def odoread():
@@ -303,13 +309,22 @@ def tripwrite(trip):
         print(f"An error occurred with tripwrite: {e}")
 
 def sceneshifter(getstatus, scene, SCENEMAX):
-    if getstatus[4] == -1:
+    if getstatus[4] == 1:
         if scene < SCENEMAX and scene >= 1:
             scene = scene + 1
             return scene # Returns scene which is active after button input
         else:	
             scene = 1
             return scene # Returns scene which is active after button input if SCENEMAX is reached
+        
+    elif getstatus[4] == -1:
+        if scene <= SCENEMAX and scene > 1:
+            scene = scene - 1
+            return scene # Returns scene which is active after button input
+        else:	
+            scene = SCENEMAX
+            return scene # Returns scene which is highest possible after button input if scene 1 is reached
+
     else:
         return scene     # Returns scene which is active without button input
 
@@ -322,7 +337,7 @@ def scenedrawer(scene, getstatus, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLI
     if scene == 2: # Trip meter scene
         roundtrip = round(trip, 1)          # Rounding trip to 1 decimal in km
         tripstring = str(roundtrip) + " km" # Converting trip to string and add km unit
-        if getstatus[5] == 1:
+        if getstatus[5] == 1:               # If longpress = 1
             trip = 0.0                      # If trip reset pressed, set trip to 0
         triplist = [tripstring, trip]       # Returns list including value and changes.
         return triplist	

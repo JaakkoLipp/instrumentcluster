@@ -63,9 +63,10 @@ for pin in GPIO_INPUT_LIST:
 
 
 # Add an event detection for the pin (both rising and falling edges)
-GPIO.add_event_detect(BLINKER_LEFT_PIN, GPIO.BOTH, callback=pin_changed_callback(BLINKER_LEFT_PIN))
-GPIO.add_event_detect(BLINKER_RIGHT_PIN, GPIO.BOTH, callback=pin_changed_callback(BLINKER_RIGHT_PIN))
-GPIO.add_event_detect(BLINKER_RIGHT_PIN, GPIO.BOTH, callback=pin_changed_callback(HI_BEAM_PIN))
+GPIO.add_event_detect(BLINKER_LEFT_PIN, GPIO.BOTH, callback=lambda x: pin_changed_callback(BLINKER_LEFT_PIN))
+GPIO.add_event_detect(BLINKER_RIGHT_PIN, GPIO.BOTH, callback=lambda x: pin_changed_callback(BLINKER_RIGHT_PIN))
+GPIO.add_event_detect(HI_BEAM_PIN, GPIO.BOTH, callback=lambda x: pin_changed_callback(HI_BEAM_PIN))
+
 
 odo = odoread()   # Datatype kilometers
 trip = tripread() # Datatype kilometers
@@ -78,40 +79,48 @@ qs_status = 1 # Sets qs status as activated on startup
 GPIO.setwarnings(False) # Sets any Gpio warnings off
 subprocess.Popen(['python3', 'rpmreader.py'])
 
-
-while True: 
-    status = get_status(LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT)
-    scene = sceneshifter(status, scene, SCENEMAX)
-    scenereturn = scenedrawer(scene, status, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V)
-    sceneout = scenereturn[0] # Output string is 1. datapoint in list, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V
-    if scene == 2:
-        trip = scenereturn[1] # If reset button have been used, scenereturn 2. datapoint is new trip(0.0)
-    elif scene == 5:
-        qs_status = scenereturn[1]
+try:
+    while True: 
+        status = get_status(LEFT_BUTTON_LIST, RIGHT_BUTTON_LIST, ENGINE_LIGHT_PIN, OIL_LIGHT_PIN, BUTTONSLEEP, HIREADLIMIT)
+        scene = sceneshifter(status, scene, SCENEMAX)
+        scenereturn = scenedrawer(scene, status, odo, trip, qs_status, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V)
+        sceneout = scenereturn[0] # Output string is 1. datapoint in list, QS_PIN, V12_READ_INPUTLIST, MULTIPLIER_12V
+        if scene == 2:
+            trip = scenereturn[1] # If reset button have been used, scenereturn 2. datapoint is new trip(0.0)
+        elif scene == 5:
+            qs_status = scenereturn[1]
     
-    gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)  # Updates only gear, speed and rpm data to save process time
-    ododata = send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) #output data as printing and returning and calculating trip distance
-    odotime = ododata[1]       # 2.nd item of odotime list is time of last measure
-    odo = odo + ododata[0]     # 1.st item of odotime list is distance between last two displayed speed 
-    trip = trip + ododata[0]
+        gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)  # Updates only gear, speed and rpm data to save process time
+        ododata = send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) #output data as printing and returning and calculating trip distance
+        odotime = ododata[1]       # 2.nd item of odotime list is time of last measure
+        odo = odo + ododata[0]     # 1.st item of odotime list is distance between last two displayed speed 
+        trip = trip + ododata[0]
 
-    tripcounter = tripcounter + ododata[0] # After about every full kilometer from starting program, write odo and trip to txt file
-    if tripcounter > 0.5:
-        shutdownwrite(odo, trip)
-        tripcounter = 0.0
+        tripcounter = tripcounter + ododata[0] # After about every full kilometer from starting program, write odo and trip to txt file
+        if tripcounter > 0.5:
+            shutdownwrite(odo, trip)
+            tripcounter = 0.0
 
-    otherdata = otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST) # Reads otherdata [nightmode(1/0), reservefuelstate(1/0), watertemperature(str))
+        otherdata = otherdataread(AMBIENT_LIGHT_LIST, NIGHTMODETHRESHOLD, WATERTEMP_INPUT_LIST, RESERVEFUEL_INPUT_LIST) # Reads otherdata [nightmode(1/0), reservefuelstate(1/0), watertemperature(str))
     
-    gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)  # Updates only gear, speed and rpm data to save process time
-    ododata = send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) # Outputs data as sending it to local server with requests and returns and calculates trip distance
-    odotime = ododata[1]
-    odo = odo + ododata[0]
-    trip = trip + ododata[0]
+        gear_speed_rpm = get_gear_speed_and_rpm(RPM_PIN, NEUTRAL_LIGHT_LIST, FRONT_SPROCKET_PULSES_PER_ROTATION, GEAR_RATIO, GEAR_SENSITIVITY, LOWREADLIMIT, SPEEDPIN, SPEEDRATIO, CORRECTION)  # Updates only gear, speed and rpm data to save process time
+        ododata = send_data_and_calc_odo(odotime, gear_speed_rpm, status, sceneout, otherdata) # Outputs data as sending it to local server with requests and returns and calculates trip distance
+        odotime = ododata[1]
+        odo = odo + ododata[0]
+        trip = trip + ododata[0]
 
-    if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) < 8.0: # Checks if power input is below voltagelimit of 8v. If true, shuts instrumentcluster down.
-        time.sleep(1)
-        if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) <8.0: # Checks again if voltage is under 8 volts
-            shutdownwrite(odo, trip)    # Commands needed to run before shutdown, saves odo and trip
+        if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) < 8.0: # Checks if power input is below voltagelimit of 8v. If true, shuts instrumentcluster down.
             time.sleep(1)
-            os.system("shutdown now -h") # Shuts down the system.
+            if read_volts_12(V12_READ_INPUTLIST, MULTIPLIER_12V) <8.0: # Checks again if voltage is under 8 volts
+                shutdownwrite(odo, trip)    # Commands needed to run before shutdown, saves odo and trip
+                time.sleep(1)
+                os.system("sudo shutdown now -h") # Shuts down the system.
     
+except KeyboardInterrupt:
+    # Cleanup GPIO on Ctrl+C
+    GPIO.cleanup()
+    print("GPIO cleanup complete.")
+
+finally:
+    GPIO.cleanup()
+    print("GPIO cleanup complete.")
